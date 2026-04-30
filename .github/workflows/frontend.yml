@@ -76,5 +76,5 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y ansible python3-pip
             ansible-galaxy collection install -r config/ansible/requirements.yml
-            ANSIBLE_HOST_KEY_CHECKING=False FRONTEND_ARTIFACT=$HOME/secureflow-deploy/apps/frontend/dist.tar.gz ansible-playbook config/ansible/site.yml --limit frontend -i config/ansible/inventories/prod/hosts.ini --private-key ~/.ssh/group1-final_key.pem
+            ANSIBLE_HOST_KEY_CHECKING=False FRONTEND_ARTIFACT=/home/azureuser/secureflow-deploy/apps/frontend/dist.tar.gz ansible-playbook config/ansible/site.yml --limit frontend -i config/ansible/inventories/prod/hosts.ini --private-key ~/.ssh/group1-final_key.pem
           "
