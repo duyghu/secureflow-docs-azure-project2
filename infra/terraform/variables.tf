@@ -56,6 +56,18 @@ variable "alert_email" {
   description = "Email address for Azure Monitor action group."
 }
 
+variable "monthly_budget_amount" {
+  type        = number
+  description = "Monthly Azure Cost Management budget amount for the project resource group."
+  default     = 20
+}
+
+variable "budget_start_date" {
+  type        = string
+  description = "Budget start date in RFC3339 format. Use the first day of the active billing month."
+  default     = "2026-05-01T00:00:00Z"
+}
+
 variable "appgw_ssl_certificate_base64" {
   type        = string
   description = "Base64-encoded PFX certificate for HTTPS listener."

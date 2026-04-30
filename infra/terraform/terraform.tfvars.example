@@ -8,5 +8,7 @@ ssh_public_key     = "ssh-rsa REPLACE_WITH_PUBLIC_KEY"
 sql_admin_login    = "secureflowadmin"
 sql_admin_password = "REPLACE_WITH_STRONG_PASSWORD"
 alert_email        = "platform-team@example.com"
+monthly_budget_amount = 20
+budget_start_date     = "2026-05-01T00:00:00Z"
 appgw_ssl_certificate_base64   = "REPLACE_WITH_BASE64_PFX"
 appgw_ssl_certificate_password = "REPLACE_WITH_PFX_PASSWORD"

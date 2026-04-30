@@ -42,6 +42,7 @@ scripts/validate-gateway.sh   End-to-end App Gateway validation script
 - Azure SQL public network access is disabled.
 - SQL access is through Private Endpoint and Private DNS.
 - Application Insights, Log Analytics, diagnostic settings, and metric alerts are included.
+- Cost Management controls include a `$20` monthly resource-group budget, budget alerts, anomaly alerting, and a saved daily cost view.
 
 ## Prerequisites
 
@@ -137,6 +138,7 @@ Acceptance proof checklist:
 - Private DNS resolves the SQL private endpoint.
 - App Gateway backend health probes are healthy.
 - At least three alerts exist: App Gateway backend health, VM CPU, SQL DTU.
+- Cost monitoring exists: monthly budget alert, forecasted overspend alert, anomaly alert, and Cost Management view.
 
 Verified deployment on April 30, 2026:
 
@@ -155,6 +157,8 @@ Place evidence images in `docs/screenshots/`:
 - `app-gateway-backend-health.png`
 - `sql-private-endpoint.png`
 - `alerts-dashboard.png`
+- `cost-management-budget.png`
+- `cost-analysis-view.png`
 
 ## Short Demo
 
@@ -164,4 +168,5 @@ Place evidence images in `docs/screenshots/`:
 4. Show no public IPs on compute and disabled SQL public access.
 5. Show App Gateway `/` and `/api/*` routing.
 6. Show Application Insights, Log Analytics, and alerts.
-7. Show GitHub Actions workflows for Terraform and app deploy.
+7. Show Azure Cost Management budget/anomaly controls from [docs/cost-monitoring-dashboard.md](docs/cost-monitoring-dashboard.md).
+8. Show GitHub Actions workflows for Terraform and app deploy.

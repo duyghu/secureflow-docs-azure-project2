@@ -101,6 +101,7 @@ requests
 - Show Azure SQL public network access disabled and the private endpoint in `snet-data`.
 - Show VM networking with no public IPs and NSGs allowing only App Gateway subnet ingress.
 - Show Application Insights, Log Analytics, and the three metric alerts.
+- Show Cost Management budget/anomaly controls and the saved cost view from `docs/cost-monitoring-dashboard.md`.
 - Show GitHub Actions workflows for infrastructure and independent app deploys.
 
 ## Verified Result
@@ -109,3 +110,15 @@ requests
 - Ansible completed with zero failures against frontend, backend, and the ops-hosted SonarQube service.
 - Public gateway checks from the ops VM returned 200 for `/` and `/api/health`.
 - Authenticated gateway test uploaded `secureflow-test-contract.txt` and read it back from `/api/documents` for `duyghu@company.com`.
+
+## Cost Monitoring
+
+Terraform creates:
+
+- `budget-secureflow-dev-monthly`: `$20` monthly budget scoped to `group1_final`.
+- 50% and 80% actual-cost alerts.
+- 100% forecasted-cost alert.
+- `cost-anomaly-sf-dev`: Cost Management anomaly email alert.
+- `cost-view-secureflow-dev-daily`: saved Cost Management view for month-to-date daily cost by resource type.
+
+Use [cost-monitoring-dashboard.md](cost-monitoring-dashboard.md) for the professor demo steps and CLI validation commands.

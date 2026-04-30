@@ -63,14 +63,17 @@ module "compute" {
 }
 
 module "monitoring" {
-  source              = "./modules/monitoring"
-  name_prefix         = local.name_prefix
-  location            = data.azurerm_resource_group.main.location
-  resource_group_name = data.azurerm_resource_group.main.name
-  action_email        = var.alert_email
-  app_gateway_id      = module.app_gateway.app_gateway_id
-  frontend_vm_id      = module.compute.frontend_vmss_id
-  backend_vm_id       = module.compute.backend_vmss_id
-  sql_database_id     = module.database.sql_database_id
-  tags                = local.tags
+  source                = "./modules/monitoring"
+  name_prefix           = local.name_prefix
+  location              = data.azurerm_resource_group.main.location
+  resource_group_name   = data.azurerm_resource_group.main.name
+  resource_group_id     = data.azurerm_resource_group.main.id
+  action_email          = var.alert_email
+  monthly_budget_amount = var.monthly_budget_amount
+  budget_start_date     = var.budget_start_date
+  app_gateway_id        = module.app_gateway.app_gateway_id
+  frontend_vm_id        = module.compute.frontend_vmss_id
+  backend_vm_id         = module.compute.backend_vmss_id
+  sql_database_id       = module.database.sql_database_id
+  tags                  = local.tags
 }

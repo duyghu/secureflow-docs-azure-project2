@@ -126,6 +126,7 @@ resource "azurerm_application_gateway" "main" {
     frontend_ip_configuration_name = "public-frontend"
     frontend_port_name             = "http"
     protocol                       = "Http"
+    host_name                      = "e-document.tech"
   }
 
   http_listener {

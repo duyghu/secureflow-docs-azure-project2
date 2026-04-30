@@ -16,6 +16,8 @@ resource "azurerm_application_insights" "main" {
   tags                = var.tags
 }
 
+data "azurerm_client_config" "current" {}
+
 resource "azurerm_monitor_action_group" "platform" {
   name                = "ag-${var.name_prefix}-platform"
   resource_group_name = var.resource_group_name
@@ -25,6 +27,102 @@ resource "azurerm_monitor_action_group" "platform" {
   email_receiver {
     name          = "platform-email"
     email_address = var.action_email
+  }
+}
+
+resource "azurerm_consumption_budget_resource_group" "monthly" {
+  name              = "budget-${var.name_prefix}-monthly"
+  resource_group_id = var.resource_group_id
+  amount            = var.monthly_budget_amount
+  time_grain        = "Monthly"
+
+  time_period {
+    start_date = var.budget_start_date
+  }
+
+  notification {
+    enabled        = true
+    operator       = "GreaterThan"
+    threshold      = 50
+    threshold_type = "Actual"
+    contact_emails = [var.action_email]
+    contact_groups = [azurerm_monitor_action_group.platform.id]
+  }
+
+  notification {
+    enabled        = true
+    operator       = "GreaterThan"
+    threshold      = 80
+    threshold_type = "Actual"
+    contact_emails = [var.action_email]
+    contact_groups = [azurerm_monitor_action_group.platform.id]
+  }
+
+  notification {
+    enabled        = true
+    operator       = "GreaterThan"
+    threshold      = 100
+    threshold_type = "Forecasted"
+    contact_emails = [var.action_email]
+    contact_groups = [azurerm_monitor_action_group.platform.id]
+  }
+}
+
+resource "azurerm_cost_anomaly_alert" "daily" {
+  name               = "cost-anomaly-sf-dev"
+  display_name       = "SecureFlow cost anomaly"
+  subscription_id    = "/subscriptions/${data.azurerm_client_config.current.subscription_id}"
+  email_subject      = "SecureFlow Docs cost anomaly detected"
+  email_addresses    = [var.action_email]
+  notification_email = var.action_email
+  message            = "Investigate unexpected Azure spend changes for SecureFlow Docs resources."
+}
+
+resource "azurerm_resource_group_cost_management_view" "dashboard" {
+  name              = "cost-view-${var.name_prefix}-daily"
+  display_name      = "SecureFlow Docs daily resource cost"
+  resource_group_id = var.resource_group_id
+  chart_type        = "StackedColumn"
+  accumulated       = true
+  timeframe         = "MonthToDate"
+  report_type       = "Usage"
+
+  dataset {
+    granularity = "Daily"
+
+    aggregation {
+      name        = "totalCost"
+      column_name = "Cost"
+    }
+
+    grouping {
+      type = "Dimension"
+      name = "ResourceType"
+    }
+
+    sorting {
+      name      = "UsageDate"
+      direction = "Ascending"
+    }
+  }
+
+  kpi {
+    type = "Forecast"
+  }
+
+  pivot {
+    type = "Dimension"
+    name = "ResourceType"
+  }
+
+  pivot {
+    type = "Dimension"
+    name = "ServiceName"
+  }
+
+  pivot {
+    type = "Dimension"
+    name = "ResourceId"
   }
 }
 
