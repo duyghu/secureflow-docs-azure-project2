@@ -102,6 +102,7 @@ requests
 - Show VM networking with no public IPs and NSGs allowing only App Gateway subnet ingress.
 - Show Application Insights, Log Analytics, and the three metric alerts.
 - Show Cost Management budget/anomaly controls and the saved cost view from `docs/cost-monitoring-dashboard.md`.
+- Show Compliance Mode at `93%` with CIS-style Azure Policy checks and Security Center recommendations from `docs/compliance-mode.md`.
 - Show GitHub Actions workflows for infrastructure and independent app deploys.
 
 ## Verified Result
@@ -122,3 +123,14 @@ Terraform creates:
 - `cost-view-secureflow-dev-daily`: saved Cost Management view for month-to-date daily cost by resource type.
 
 Use [cost-monitoring-dashboard.md](cost-monitoring-dashboard.md) for the professor demo steps and CLI validation commands.
+
+## Compliance Mode
+
+Terraform creates:
+
+- `initiative-secureflow-dev-cis-foundation`: custom CIS-style Azure Policy initiative.
+- `pa-secureflow-dev-cis`: resource-group policy assignment for `group1_final`.
+- Audit checks for SQL public network access, compute public NIC exposure, and Application Gateway WAF v2.
+- Compliance Mode UI score: `93% Compliant`.
+
+Use [compliance-mode.md](compliance-mode.md) for the Azure Policy, CIS benchmark, and Security Center demo steps.

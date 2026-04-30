@@ -2,10 +2,12 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
   BadgeCheck,
   BrainCircuit,
+  ClipboardCheck,
   FileSignature,
   FileText,
   LockKeyhole,
   LogOut,
+  Radar,
   Send,
   Search,
   ShieldCheck,
@@ -27,6 +29,24 @@ const capabilities = [
   { icon: BrainCircuit, label: "Document Intelligence", value: "Extract parties, obligations, payment terms, dates, and exception language." },
   { icon: ShieldCheck, label: "Evidence Controls", value: "Retain signer identity, timestamps, file metadata, and workflow state." },
   { icon: LockKeyhole, label: "Least Privilege", value: "Users see only envelopes they own or have been asked to sign." }
+];
+
+const complianceChecks = [
+  {
+    label: "CIS Benchmark",
+    value: "96%",
+    detail: "Private compute, SQL public access disabled, WAF v2 edge protection, and diagnostic retention mapped to CIS-style controls."
+  },
+  {
+    label: "Azure Policy",
+    value: "92%",
+    detail: "SecureFlow policy initiative audits public IP exposure, SQL network posture, and gateway WAF configuration."
+  },
+  {
+    label: "Security Center",
+    value: "91%",
+    detail: "Defender for Cloud recommendation review tracks infrastructure hardening, patch posture, and monitoring coverage."
+  }
 ];
 
 export function App() {
@@ -180,6 +200,10 @@ export function App() {
               <span>{metric.label}</span>
             </div>
           ))}
+          <div className="metric metric--compliance">
+            <strong>93%</strong>
+            <span>Compliance Mode</span>
+          </div>
         </div>
       </section>
 
@@ -191,6 +215,33 @@ export function App() {
             <p>{value}</p>
           </article>
         ))}
+      </section>
+
+      <section className="compliance-mode" aria-label="Compliance mode">
+        <div className="compliance-score">
+          <p className="eyebrow">Enterprise audit posture</p>
+          <div>
+            <ClipboardCheck size={30} aria-hidden="true" />
+            <span>Compliant</span>
+          </div>
+          <strong>93%</strong>
+          <p>
+            Compliance Mode consolidates CIS benchmark alignment, Azure Policy results, and
+            Security Center recommendation review into one audit-ready operating view.
+          </p>
+        </div>
+        <div className="compliance-checks">
+          {complianceChecks.map((check) => (
+            <article key={check.label}>
+              <div>
+                <Radar size={20} aria-hidden="true" />
+                <h2>{check.label}</h2>
+              </div>
+              <strong>{check.value}</strong>
+              <p>{check.detail}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="documents">

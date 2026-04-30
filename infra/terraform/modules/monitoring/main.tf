@@ -18,6 +18,139 @@ resource "azurerm_application_insights" "main" {
 
 data "azurerm_client_config" "current" {}
 
+resource "azurerm_policy_definition" "audit_sql_public_network_disabled" {
+  name         = "policy-${var.name_prefix}-sql-private-access"
+  policy_type  = "Custom"
+  mode         = "Indexed"
+  display_name = "SecureFlow CIS - SQL public network access disabled"
+  description  = "Audits Azure SQL servers where public network access is not disabled."
+
+  metadata = jsonencode({
+    category = "CIS Microsoft Azure Foundations Benchmark"
+    control  = "Secure database networking"
+  })
+
+  policy_rule = jsonencode({
+    if = {
+      allOf = [
+        {
+          field  = "type"
+          equals = "Microsoft.Sql/servers"
+        },
+        {
+          field     = "Microsoft.Sql/servers/publicNetworkAccess"
+          notEquals = "Disabled"
+        }
+      ]
+    }
+    then = {
+      effect = "audit"
+    }
+  })
+}
+
+resource "azurerm_policy_definition" "audit_public_nics" {
+  name         = "policy-${var.name_prefix}-no-public-nics"
+  policy_type  = "Custom"
+  mode         = "Indexed"
+  display_name = "SecureFlow CIS - compute has no public NIC exposure"
+  description  = "Audits network interfaces that reference a public IP configuration."
+
+  metadata = jsonencode({
+    category = "CIS Microsoft Azure Foundations Benchmark"
+    control  = "Restrict public management exposure"
+  })
+
+  policy_rule = jsonencode({
+    if = {
+      allOf = [
+        {
+          field  = "type"
+          equals = "Microsoft.Network/networkInterfaces"
+        },
+        {
+          field  = "Microsoft.Network/networkInterfaces/ipconfigurations[*].publicIpAddress.id"
+          exists = true
+        }
+      ]
+    }
+    then = {
+      effect = "audit"
+    }
+  })
+}
+
+resource "azurerm_policy_definition" "audit_app_gateway_waf" {
+  name         = "policy-${var.name_prefix}-appgw-waf-v2"
+  policy_type  = "Custom"
+  mode         = "Indexed"
+  display_name = "SecureFlow CIS - Application Gateway WAF v2 enabled"
+  description  = "Audits Application Gateway resources that are not deployed with WAF v2 tier."
+
+  metadata = jsonencode({
+    category = "CIS Microsoft Azure Foundations Benchmark"
+    control  = "Protect public ingress with WAF"
+  })
+
+  policy_rule = jsonencode({
+    if = {
+      allOf = [
+        {
+          field  = "type"
+          equals = "Microsoft.Network/applicationGateways"
+        },
+        {
+          field     = "Microsoft.Network/applicationGateways/sku.tier"
+          notEquals = "WAF_v2"
+        }
+      ]
+    }
+    then = {
+      effect = "audit"
+    }
+  })
+}
+
+resource "azurerm_policy_set_definition" "cis_foundation" {
+  name         = "initiative-${var.name_prefix}-cis-foundation"
+  policy_type  = "Custom"
+  display_name = "SecureFlow CIS Foundation Controls"
+  description  = "CIS-style Azure baseline for private ingress, private compute, and private data access."
+
+  metadata = jsonencode({
+    category = "CIS Microsoft Azure Foundations Benchmark"
+  })
+
+  policy_definition_reference {
+    policy_definition_id = azurerm_policy_definition.audit_sql_public_network_disabled.id
+    reference_id         = "sql-public-network-disabled"
+  }
+
+  policy_definition_reference {
+    policy_definition_id = azurerm_policy_definition.audit_public_nics.id
+    reference_id         = "compute-no-public-nics"
+  }
+
+  policy_definition_reference {
+    policy_definition_id = azurerm_policy_definition.audit_app_gateway_waf.id
+    reference_id         = "app-gateway-waf-v2"
+  }
+}
+
+resource "azurerm_resource_group_policy_assignment" "cis_foundation" {
+  name                 = "pa-${var.name_prefix}-cis"
+  resource_group_id    = var.resource_group_id
+  policy_definition_id = azurerm_policy_set_definition.cis_foundation.id
+  display_name         = "SecureFlow CIS Foundation Controls"
+  description          = "Audits SecureFlow Docs against CIS-style controls for private networking, Azure SQL exposure, and WAF ingress."
+  enforce              = false
+  location             = var.location
+
+  non_compliance_message {
+    content = "SecureFlow Docs must keep compute private, SQL public access disabled, and the only public entry protected by Application Gateway WAF v2."
+  }
+}
+
 resource "azurerm_monitor_action_group" "platform" {
   name                = "ag-${var.name_prefix}-platform"
   resource_group_name = var.resource_group_name

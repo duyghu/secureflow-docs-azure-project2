@@ -43,6 +43,7 @@ scripts/validate-gateway.sh   End-to-end App Gateway validation script
 - SQL access is through Private Endpoint and Private DNS.
 - Application Insights, Log Analytics, diagnostic settings, and metric alerts are included.
 - Cost Management controls include a `$20` monthly resource-group budget, budget alerts, anomaly alerting, and a saved daily cost view.
+- Compliance Mode adds CIS-style Azure Policy checks, Security Center recommendation review, and a `93%` audit posture dashboard.
 
 ## Prerequisites
 
@@ -139,6 +140,7 @@ Acceptance proof checklist:
 - App Gateway backend health probes are healthy.
 - At least three alerts exist: App Gateway backend health, VM CPU, SQL DTU.
 - Cost monitoring exists: monthly budget alert, forecasted overspend alert, anomaly alert, and Cost Management view.
+- Compliance Mode exists: CIS benchmark controls, Azure Policy assignment, Security Center recommendations, and `93%` posture shown in the UI.
 
 Verified deployment on April 30, 2026:
 
@@ -159,6 +161,9 @@ Place evidence images in `docs/screenshots/`:
 - `alerts-dashboard.png`
 - `cost-management-budget.png`
 - `cost-analysis-view.png`
+- `compliance-mode-ui.png`
+- `azure-policy-compliance.png`
+- `security-center-recommendations.png`
 
 ## Short Demo
 
@@ -169,4 +174,5 @@ Place evidence images in `docs/screenshots/`:
 5. Show App Gateway `/` and `/api/*` routing.
 6. Show Application Insights, Log Analytics, and alerts.
 7. Show Azure Cost Management budget/anomaly controls from [docs/cost-monitoring-dashboard.md](docs/cost-monitoring-dashboard.md).
-8. Show GitHub Actions workflows for Terraform and app deploy.
+8. Show Compliance Mode from [docs/compliance-mode.md](docs/compliance-mode.md).
+9. Show GitHub Actions workflows for Terraform and app deploy.

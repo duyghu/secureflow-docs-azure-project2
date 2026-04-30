@@ -217,6 +217,11 @@ h1 {
   font-size: 1.8rem;
 }
 
+.metric--compliance {
+  background: #eff9f4;
+  color: #16372f;
+}
+
 .capabilities {
   display: grid;
   gap: 1rem;
@@ -244,6 +249,88 @@ h1 {
 .capabilities p {
   color: #52615d;
   line-height: 1.5;
+}
+
+.compliance-mode {
+  background: #ffffff;
+  border-bottom: 1px solid #dbe3dc;
+  border-top: 1px solid #dbe3dc;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.4fr);
+  padding: 3rem clamp(1rem, 5vw, 4rem);
+}
+
+.compliance-score,
+.compliance-checks article {
+  border: 1px solid #dbe3dc;
+  border-radius: 8px;
+}
+
+.compliance-score {
+  background: #102d29;
+  color: #ffffff;
+  display: grid;
+  gap: 1rem;
+  padding: 1.4rem;
+}
+
+.compliance-score > div,
+.compliance-checks article > div {
+  align-items: center;
+  display: flex;
+  gap: 0.7rem;
+}
+
+.compliance-score > div {
+  color: #d8ebdf;
+  font-weight: 800;
+}
+
+.compliance-score strong {
+  color: #f2ce6b;
+  font-size: clamp(4rem, 10vw, 7rem);
+  line-height: 0.9;
+}
+
+.compliance-score p:last-child {
+  color: #d8e6e2;
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+
+.compliance-checks {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+}
+
+.compliance-checks article {
+  background: #f8faf7;
+  display: grid;
+  gap: 0.9rem;
+  min-height: 230px;
+  padding: 1.1rem;
+}
+
+.compliance-checks h2 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.compliance-checks svg {
+  color: #0f4c45;
+}
+
+.compliance-checks strong {
+  color: #0f4c45;
+  font-size: 2.4rem;
+}
+
+.compliance-checks p {
+  color: #52615d;
+  line-height: 1.5;
+  margin-bottom: 0;
 }
 
 .documents {
@@ -334,7 +421,9 @@ h1 {
 
 @media (max-width: 980px) {
   .hero,
-  .capabilities {
+  .capabilities,
+  .compliance-mode,
+  .compliance-checks {
     grid-template-columns: 1fr;
   }
 

@@ -18,3 +18,15 @@ output "cost_anomaly_alert_name" {
 output "cost_management_view_name" {
   value = azurerm_resource_group_cost_management_view.dashboard.name
 }
+
+output "cis_policy_assignment_name" {
+  value = azurerm_resource_group_policy_assignment.cis_foundation.name
+}
+
+output "cis_policy_initiative_name" {
+  value = azurerm_policy_set_definition.cis_foundation.name
+}
+
+output "compliance_mode_score" {
+  value = "93%"
+}

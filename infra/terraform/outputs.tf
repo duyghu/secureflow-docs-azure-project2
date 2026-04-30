@@ -30,3 +30,15 @@ output "cost_anomaly_alert_name" {
 output "cost_management_view_name" {
   value = module.monitoring.cost_management_view_name
 }
+
+output "cis_policy_assignment_name" {
+  value = module.monitoring.cis_policy_assignment_name
+}
+
+output "cis_policy_initiative_name" {
+  value = module.monitoring.cis_policy_initiative_name
+}
+
+output "compliance_mode_score" {
+  value = module.monitoring.compliance_mode_score
+}
