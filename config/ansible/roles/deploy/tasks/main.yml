@@ -1,0 +1,99 @@
+---
+- name: Create application directory
+  ansible.builtin.file:
+    path: "/opt/secureflow/{{ app_component }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: "0755"
+
+- name: Copy frontend artifact
+  ansible.builtin.unarchive:
+    src: "{{ lookup('env', 'FRONTEND_ARTIFACT') | default('../../../apps/frontend/dist.tar.gz', true) }}"
+    dest: /var/www/html
+    remote_src: false
+    owner: www-data
+    group: www-data
+  when: app_component == "frontend"
+
+- name: Render nginx default site
+  ansible.builtin.copy:
+    dest: /etc/nginx/sites-available/default
+    mode: "0644"
+    content: |
+      server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        root /var/www/html;
+        index index.html;
+
+        location / {
+          try_files $uri /index.html;
+        }
+
+        location /health {
+          return 200 'ok';
+          add_header Content-Type text/plain;
+        }
+      }
+  when: app_component == "frontend"
+
+- name: Copy backend jar
+  ansible.builtin.copy:
+    src: "{{ lookup('env', 'BACKEND_ARTIFACT') | default('../../../apps/backend/target/secureflow-docs-backend-0.1.0.jar', true) }}"
+    dest: /opt/secureflow/backend/secureflow-docs-api.jar
+    owner: www-data
+    group: www-data
+    mode: "0644"
+  when: app_component == "backend"
+
+- name: Create backend environment file
+  ansible.builtin.copy:
+    dest: /etc/secureflow-api.env
+    owner: root
+    group: root
+    mode: "0600"
+    content: |
+      SPRING_DATASOURCE_URL=jdbc:sqlserver://{{ lookup('env', 'SQL_SERVER_FQDN') }}:1433;database={{ lookup('env', 'SQL_DATABASE_NAME') | default('sqldb-secureflow-docs', true) }};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;
+      SPRING_DATASOURCE_USERNAME={{ lookup('env', 'SQL_ADMIN_LOGIN') | default('secureflowadmin', true) }}
+      SPRING_DATASOURCE_PASSWORD={{ lookup('env', 'SQL_ADMIN_PASSWORD') }}
+      APPLICATIONINSIGHTS_CONNECTION_STRING={{ lookup('env', 'APPLICATIONINSIGHTS_CONNECTION_STRING') | default('', true) }}
+  no_log: true
+  when: app_component == "backend"
+
+- name: Render backend systemd service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/secureflow-api.service
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=SecureFlow Docs API
+      After=network.target
+
+      [Service]
+      User=www-data
+      WorkingDirectory=/opt/secureflow/backend
+      Environment=SERVER_PORT=8080
+      EnvironmentFile=-/etc/secureflow-api.env
+      ExecStart=/usr/bin/java -jar /opt/secureflow/backend/secureflow-docs-api.jar
+      Restart=always
+      RestartSec=10
+
+      [Install]
+      WantedBy=multi-user.target
+  when: app_component == "backend"
+
+- name: Start backend service
+  ansible.builtin.systemd:
+    name: secureflow-api
+    daemon_reload: true
+    enabled: true
+    state: restarted
+  when: app_component == "backend"
+
+- name: Ensure nginx serves frontend
+  ansible.builtin.service:
+    name: nginx
+    enabled: true
+    state: restarted
+  when: app_component == "frontend"

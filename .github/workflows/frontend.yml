@@ -1,0 +1,79 @@
+name: Frontend
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "apps/frontend/**"
+      - ".github/workflows/frontend.yml"
+  pull_request:
+    paths:
+      - "apps/frontend/**"
+
+jobs:
+  build-scan-package:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: apps/frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Package artifact
+        run: tar -czf dist.tar.gz -C dist .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: secureflow-frontend
+          path: apps/frontend/dist.tar.gz
+
+  deploy:
+    needs: build-scan-package
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: secureflow-frontend
+          path: apps/frontend
+
+      - name: Copy deployment files to ops VM
+        env:
+          OPS_HOST: ${{ secrets.OPS_HOST }}
+          OPS_USER: ${{ secrets.OPS_USER || 'azureuser' }}
+          OPS_SSH_KEY: ${{ secrets.OPS_SSH_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$OPS_SSH_KEY" > ~/.ssh/ops_key
+          chmod 600 ~/.ssh/ops_key
+          ssh -i ~/.ssh/ops_key -o StrictHostKeyChecking=no "$OPS_USER@$OPS_HOST" "mkdir -p ~/secureflow-deploy/apps/frontend ~/secureflow-deploy/config ~/secureflow-deploy/scripts"
+          scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no apps/frontend/dist.tar.gz "$OPS_USER@$OPS_HOST:~/secureflow-deploy/apps/frontend/dist.tar.gz"
+          scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no -r config/ansible "$OPS_USER@$OPS_HOST:~/secureflow-deploy/config/"
+          scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no -r scripts "$OPS_USER@$OPS_HOST:~/secureflow-deploy/"
+
+      - name: Deploy frontend from ops VM
+        env:
+          OPS_HOST: ${{ secrets.OPS_HOST }}
+          OPS_USER: ${{ secrets.OPS_USER || 'azureuser' }}
+        run: |
+          ssh -i ~/.ssh/ops_key -o StrictHostKeyChecking=no "$OPS_USER@$OPS_HOST" "
+            set -e
+            cd ~/secureflow-deploy
+            sudo apt-get update
+            sudo apt-get install -y ansible python3-pip
+            ansible-galaxy collection install -r config/ansible/requirements.yml
+            RESOURCE_GROUP=${{ vars.RESOURCE_GROUP_NAME || 'group1_final' }} ./scripts/generate-ansible-inventory.sh config/ansible/inventories/prod/hosts.ini
+            FRONTEND_ARTIFACT=$HOME/secureflow-deploy/apps/frontend/dist.tar.gz ansible-playbook config/ansible/site.yml --limit frontend -i config/ansible/inventories/prod/hosts.ini
+          "

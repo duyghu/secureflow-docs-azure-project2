@@ -1,0 +1,24 @@
+# Build outputs
+apps/frontend/dist/
+apps/frontend/node_modules/
+apps/frontend/dist.tar.gz
+apps/frontend/*.tsbuildinfo
+apps/frontend/vite.config.js
+apps/frontend/vite.config.d.ts
+apps/backend/target/
+/package-lock.json
+
+# Local config
+.env
+*.tfvars
+!infra/terraform/terraform.tfvars.example
+
+# Terraform
+.terraform/
+terraform.tfstate*
+tfplan*
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/

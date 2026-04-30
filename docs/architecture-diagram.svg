@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-labelledby="title desc">
+  <title id="title">SecureFlow Docs Azure 3-tier architecture</title>
+  <desc id="desc">Application Gateway WAF is the only public entry. Traffic routes privately to frontend and backend VMs. Backend reaches Azure SQL through private endpoint and private DNS. Monitoring uses Application Insights, Log Analytics, and alerts.</desc>
+  <rect width="1280" height="760" fill="#f5f7f4"/>
+  <text x="54" y="62" font-family="Arial" font-size="32" font-weight="700" fill="#12211e">SecureFlow Docs - Azure Private 3-Tier Architecture</text>
+  <rect x="42" y="100" width="1196" height="590" rx="8" fill="#ffffff" stroke="#c9d7d0" stroke-width="2"/>
+  <text x="70" y="138" font-family="Arial" font-size="19" font-weight="700" fill="#31413d">Resource Group: rg-secureflow-dev</text>
+  <rect x="72" y="168" width="860" height="470" rx="8" fill="#eef4f1" stroke="#b6c7c0"/>
+  <text x="96" y="205" font-family="Arial" font-size="18" font-weight="700" fill="#31413d">VNet 10.40.0.0/16</text>
+  <rect x="106" y="232" width="190" height="150" rx="8" fill="#dfe9e5" stroke="#8fac9f"/>
+  <text x="126" y="262" font-family="Arial" font-size="15" font-weight="700" fill="#173a35">snet-appgw</text>
+  <rect x="136" y="286" width="130" height="58" rx="8" fill="#0f4c45"/>
+  <text x="154" y="321" font-family="Arial" font-size="15" font-weight="700" fill="#ffffff">App GW WAF v2</text>
+  <rect x="346" y="232" width="190" height="150" rx="8" fill="#dfe9e5" stroke="#8fac9f"/>
+  <text x="366" y="262" font-family="Arial" font-size="15" font-weight="700" fill="#173a35">snet-web</text>
+  <rect x="380" y="286" width="122" height="58" rx="8" fill="#ffffff" stroke="#0f4c45"/>
+  <text x="406" y="321" font-family="Arial" font-size="15" font-weight="700" fill="#173a35">React VM</text>
+  <rect x="586" y="232" width="190" height="150" rx="8" fill="#dfe9e5" stroke="#8fac9f"/>
+  <text x="606" y="262" font-family="Arial" font-size="15" font-weight="700" fill="#173a35">snet-api</text>
+  <rect x="618" y="286" width="126" height="58" rx="8" fill="#ffffff" stroke="#0f4c45"/>
+  <text x="640" y="313" font-family="Arial" font-size="15" font-weight="700" fill="#173a35">Spring Boot</text>
+  <text x="662" y="333" font-family="Arial" font-size="12" fill="#52615d">:8080</text>
+  <rect x="346" y="440" width="430" height="150" rx="8" fill="#dfe9e5" stroke="#8fac9f"/>
+  <text x="366" y="470" font-family="Arial" font-size="15" font-weight="700" fill="#173a35">snet-data</text>
+  <rect x="386" y="494" width="148" height="58" rx="8" fill="#ffffff" stroke="#0f4c45"/>
+  <text x="408" y="528" font-family="Arial" font-size="15" font-weight="700" fill="#173a35">Private Endpoint</text>
+  <rect x="582" y="494" width="144" height="58" rx="8" fill="#ffffff" stroke="#0f4c45"/>
+  <text x="616" y="519" font-family="Arial" font-size="15" font-weight="700" fill="#173a35">Azure SQL</text>
+  <text x="606" y="539" font-family="Arial" font-size="12" fill="#52615d">Public disabled</text>
+  <rect x="812" y="232" width="90" height="358" rx="8" fill="#dfe9e5" stroke="#8fac9f"/>
+  <text x="832" y="262" font-family="Arial" font-size="15" font-weight="700" fill="#173a35">snet-ops</text>
+  <text x="826" y="300" font-family="Arial" font-size="13" fill="#52615d">Bastion</text>
+  <text x="826" y="322" font-family="Arial" font-size="13" fill="#52615d">Runner</text>
+  <text x="826" y="344" font-family="Arial" font-size="13" fill="#52615d">Ansible</text>
+  <rect x="980" y="188" width="210" height="150" rx="8" fill="#fff9e8" stroke="#d0b25c"/>
+  <text x="1006" y="224" font-family="Arial" font-size="16" font-weight="700" fill="#594811">GitHub Actions</text>
+  <text x="1006" y="254" font-family="Arial" font-size="13" fill="#594811">build, test, scan</text>
+  <text x="1006" y="278" font-family="Arial" font-size="13" fill="#594811">terraform plan/apply</text>
+  <text x="1006" y="302" font-family="Arial" font-size="13" fill="#594811">ansible deploy</text>
+  <rect x="980" y="390" width="210" height="150" rx="8" fill="#eaf1ff" stroke="#8aa8d8"/>
+  <text x="1006" y="426" font-family="Arial" font-size="16" font-weight="700" fill="#153b6f">Monitoring</text>
+  <text x="1006" y="456" font-family="Arial" font-size="13" fill="#153b6f">Application Insights</text>
+  <text x="1006" y="480" font-family="Arial" font-size="13" fill="#153b6f">Log Analytics</text>
+  <text x="1006" y="504" font-family="Arial" font-size="13" fill="#153b6f">Metric alerts</text>
+  <line x1="38" y1="315" x2="136" y2="315" stroke="#0f4c45" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="48" y="296" font-family="Arial" font-size="13" fill="#173a35">Internet</text>
+  <line x1="266" y1="315" x2="380" y2="315" stroke="#0f4c45" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="304" y="296" font-family="Arial" font-size="13" fill="#173a35">/</text>
+  <line x1="266" y1="315" x2="618" y2="315" stroke="#b98016" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="430" y="296" font-family="Arial" font-size="13" fill="#594811">/api/*</text>
+  <line x1="681" y1="344" x2="534" y2="494" stroke="#0f4c45" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="534" y1="523" x2="582" y2="523" stroke="#0f4c45" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="1085" y1="338" x2="1085" y2="390" stroke="#8aa8d8" stroke-width="3" marker-end="url(#arrow)"/>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#0f4c45"/>
+    </marker>
+  </defs>
+</svg>
