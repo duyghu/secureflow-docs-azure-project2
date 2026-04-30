@@ -28,13 +28,14 @@ jobs:
         run: mvn -B clean verify
 
       - name: SonarQube scan
-        if: ${{ secrets.SONAR_TOKEN != '' }}
+        if: ${{ env.SONAR_TOKEN != '' }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
           mvn -B sonar:sonar \
-            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.host.url="$SONAR_HOST_URL" \
+            -Dsonar.token="$SONAR_TOKEN"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -61,7 +62,9 @@ jobs:
           install -m 700 -d ~/.ssh
           printf '%s\n' "$OPS_SSH_KEY" > ~/.ssh/ops_key
           chmod 600 ~/.ssh/ops_key
-          ssh -i ~/.ssh/ops_key -o StrictHostKeyChecking=no "$OPS_USER@$OPS_HOST" "mkdir -p ~/secureflow-deploy/apps/backend/target ~/secureflow-deploy/config ~/secureflow-deploy/scripts"
+          ssh -i ~/.ssh/ops_key -o StrictHostKeyChecking=no "$OPS_USER@$OPS_HOST" "mkdir -p ~/secureflow-deploy/apps/backend/target ~/secureflow-deploy/config ~/secureflow-deploy/scripts ~/.ssh && chmod 700 ~/.ssh"
+          scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no ~/.ssh/ops_key "$OPS_USER@$OPS_HOST:~/.ssh/group1-final_key.pem"
+          ssh -i ~/.ssh/ops_key -o StrictHostKeyChecking=no "$OPS_USER@$OPS_HOST" "chmod 600 ~/.ssh/group1-final_key.pem"
           scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no apps/backend/target/secureflow-docs-backend-0.1.0.jar "$OPS_USER@$OPS_HOST:~/secureflow-deploy/apps/backend/target/secureflow-docs-backend-0.1.0.jar"
           scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no -r config/ansible "$OPS_USER@$OPS_HOST:~/secureflow-deploy/config/"
           scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no -r scripts "$OPS_USER@$OPS_HOST:~/secureflow-deploy/"
@@ -82,6 +85,5 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y ansible python3-pip
             ansible-galaxy collection install -r config/ansible/requirements.yml
-            RESOURCE_GROUP=${{ vars.RESOURCE_GROUP_NAME || 'group1_final' }} ./scripts/generate-ansible-inventory.sh config/ansible/inventories/prod/hosts.ini
-            SQL_SERVER_FQDN='$SQL_SERVER_FQDN' SQL_DATABASE_NAME='$SQL_DATABASE_NAME' SQL_ADMIN_LOGIN='$SQL_ADMIN_LOGIN' SQL_ADMIN_PASSWORD='$SQL_ADMIN_PASSWORD' APPLICATIONINSIGHTS_CONNECTION_STRING='$APPLICATIONINSIGHTS_CONNECTION_STRING' BACKEND_ARTIFACT=$HOME/secureflow-deploy/apps/backend/target/secureflow-docs-backend-0.1.0.jar ansible-playbook config/ansible/site.yml --limit backend -i config/ansible/inventories/prod/hosts.ini
+            ANSIBLE_HOST_KEY_CHECKING=False SQL_SERVER_FQDN='$SQL_SERVER_FQDN' SQL_DATABASE_NAME='$SQL_DATABASE_NAME' SQL_ADMIN_LOGIN='$SQL_ADMIN_LOGIN' SQL_ADMIN_PASSWORD='$SQL_ADMIN_PASSWORD' APPLICATIONINSIGHTS_CONNECTION_STRING='$APPLICATIONINSIGHTS_CONNECTION_STRING' BACKEND_ARTIFACT=$HOME/secureflow-deploy/apps/backend/target/secureflow-docs-backend-0.1.0.jar ansible-playbook config/ansible/site.yml --limit backend -i config/ansible/inventories/prod/hosts.ini --private-key ~/.ssh/group1-final_key.pem
           "

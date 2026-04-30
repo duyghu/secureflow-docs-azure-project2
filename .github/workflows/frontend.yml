@@ -58,7 +58,9 @@ jobs:
           install -m 700 -d ~/.ssh
           printf '%s\n' "$OPS_SSH_KEY" > ~/.ssh/ops_key
           chmod 600 ~/.ssh/ops_key
-          ssh -i ~/.ssh/ops_key -o StrictHostKeyChecking=no "$OPS_USER@$OPS_HOST" "mkdir -p ~/secureflow-deploy/apps/frontend ~/secureflow-deploy/config ~/secureflow-deploy/scripts"
+          ssh -i ~/.ssh/ops_key -o StrictHostKeyChecking=no "$OPS_USER@$OPS_HOST" "mkdir -p ~/secureflow-deploy/apps/frontend ~/secureflow-deploy/config ~/secureflow-deploy/scripts ~/.ssh && chmod 700 ~/.ssh"
+          scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no ~/.ssh/ops_key "$OPS_USER@$OPS_HOST:~/.ssh/group1-final_key.pem"
+          ssh -i ~/.ssh/ops_key -o StrictHostKeyChecking=no "$OPS_USER@$OPS_HOST" "chmod 600 ~/.ssh/group1-final_key.pem"
           scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no apps/frontend/dist.tar.gz "$OPS_USER@$OPS_HOST:~/secureflow-deploy/apps/frontend/dist.tar.gz"
           scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no -r config/ansible "$OPS_USER@$OPS_HOST:~/secureflow-deploy/config/"
           scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no -r scripts "$OPS_USER@$OPS_HOST:~/secureflow-deploy/"
@@ -74,6 +76,5 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y ansible python3-pip
             ansible-galaxy collection install -r config/ansible/requirements.yml
-            RESOURCE_GROUP=${{ vars.RESOURCE_GROUP_NAME || 'group1_final' }} ./scripts/generate-ansible-inventory.sh config/ansible/inventories/prod/hosts.ini
-            FRONTEND_ARTIFACT=$HOME/secureflow-deploy/apps/frontend/dist.tar.gz ansible-playbook config/ansible/site.yml --limit frontend -i config/ansible/inventories/prod/hosts.ini
+            ANSIBLE_HOST_KEY_CHECKING=False FRONTEND_ARTIFACT=$HOME/secureflow-deploy/apps/frontend/dist.tar.gz ansible-playbook config/ansible/site.yml --limit frontend -i config/ansible/inventories/prod/hosts.ini --private-key ~/.ssh/group1-final_key.pem
           "
