@@ -103,7 +103,7 @@ requests
 - Show Application Insights, Log Analytics, and the three metric alerts.
 - Show Cost Management budget/anomaly controls and the saved cost view from `docs/cost-monitoring-dashboard.md`.
 - Show Compliance Mode at `93%` with CIS-style Azure Policy checks and Security Center recommendations from `docs/compliance-mode.md`.
-- Show Backup and DR at `95%` with Azure Backup, SQL PITR, and the restore drill from `docs/backup-disaster-recovery.md`.
+- Show Backup and DR with Azure Backup, SQL PITR, and the restore drill from `docs/backup-disaster-recovery.md`.
 - Show AI Security Summary with WAF/API anomaly detection and failed-login burst analysis from `docs/ai-powered-log-analysis.md`.
 - Show Key Vault secret storage and VMSS SSH access through the ops VM from `docs/key-vault-and-vmss-access.md`.
 - Show GitHub Actions workflows for infrastructure and independent app deploys.
@@ -146,7 +146,7 @@ Terraform creates:
 - `bkpol-secureflow-dev-vm-daily`: daily VM backup policy.
 - SQL short-term retention for `14` day point-in-time restore.
 - SQL long-term retention for weekly, monthly, and yearly recovery evidence.
-- DR Readiness UI score: `95%`.
+- Azure recovery evidence for Recovery Services Vault, SQL PITR, and restore drill readiness.
 
 Use [backup-disaster-recovery.md](backup-disaster-recovery.md) for the Recovery Services Vault, SQL PITR, and deleted-record restore demo steps.
 
@@ -156,7 +156,7 @@ Terraform creates:
 
 - `alert-secureflow-dev-ai-api-traffic-spike`: scheduled Kusto alert for suspicious `/api/*` traffic concentration.
 - `alert-secureflow-dev-ai-failed-login-burst`: scheduled Kusto alert for repeated failed login attempts.
-- AI Security Summary UI panel.
+- AI Security Summary evidence from Log Analytics alert logic.
 
 Use [ai-powered-log-analysis.md](ai-powered-log-analysis.md) for Kusto queries, alert validation, and the security operations demo script.
 

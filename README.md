@@ -44,7 +44,7 @@ scripts/validate-gateway.sh   End-to-end App Gateway validation script
 - Application Insights, Log Analytics, diagnostic settings, and metric alerts are included.
 - Cost Management controls include a `$20` monthly resource-group budget, budget alerts, anomaly alerting, and a saved daily cost view.
 - Compliance Mode adds CIS-style Azure Policy checks, Security Center recommendation review, and a `93%` audit posture dashboard.
-- Backup and DR controls include Azure Backup vault/policy, SQL PITR/LTR, and a `95%` recovery readiness dashboard.
+- Backup and DR controls include Azure Backup vault/policy, SQL PITR/LTR, and Azure Portal recovery evidence.
 - AI-powered log analysis detects WAF/API traffic spikes and failed-login bursts, then presents an `AI Security Summary`.
 - Key Vault stores operational secrets behind a private endpoint with RBAC access for VMSS managed identities.
 
@@ -143,9 +143,9 @@ Acceptance proof checklist:
 - App Gateway backend health probes are healthy.
 - At least three alerts exist: App Gateway backend health, VM CPU, SQL DTU.
 - Cost monitoring exists: monthly budget alert, forecasted overspend alert, anomaly alert, and Cost Management view.
-- Compliance Mode exists: CIS benchmark controls, Azure Policy assignment, Security Center recommendations, and `93%` posture shown in the UI.
+- Compliance Mode exists: CIS benchmark controls, Azure Policy assignment, Security Center recommendations, and `93%` posture documented as Azure governance evidence.
 - Backup and DR exists: Recovery Services Vault, VM backup policy, SQL PITR retention, SQL LTR policy, and recovery drill runbook.
-- AI log analysis exists: Log Analytics Kusto rules, scheduled query alerts, and AI Security Summary shown in the UI.
+- AI log analysis exists: Log Analytics Kusto rules, scheduled query alerts, and AI Security Summary evidence in Azure monitoring docs.
 - Key Vault exists: private endpoint, private DNS, secret inventory, and documented VMSS SSH jump-host access.
 
 Verified deployment on April 30, 2026:

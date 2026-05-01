@@ -33,7 +33,7 @@ SecureFlow Docs includes a production-style backup and recovery posture for comp
 6. Open Backup policies and show `bkpol-secureflow-dev-vm-daily`.
 7. Open Azure SQL database `sqldb-secureflow-docs`.
 8. Show Backup / Restore options and point-in-time restore availability.
-9. Open the SecureFlow web app and show `DR Readiness 95%`.
+9. Show the Azure Backup vault, SQL restore settings, and the documented restore evidence.
 
 ## Recovery Demonstration
 

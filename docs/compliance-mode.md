@@ -57,7 +57,7 @@ Review recommendations for:
 7. Show that compute uses private IPs and Azure SQL public network access is disabled.
 8. Open Microsoft Defender for Cloud.
 9. Open Recommendations and show the Security Center recommendation review.
-10. Open the SecureFlow web app and show Compliance Mode: `Compliant 93%`.
+10. Show the Azure Policy assignment, Defender for Cloud recommendations, and documented compliance posture: `Compliant 93%`.
 
 ## CLI Validation
 

@@ -1,20 +1,13 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
-  Activity,
   BadgeCheck,
-  Bot,
   BrainCircuit,
-  ClipboardCheck,
-  DatabaseBackup,
   FileSignature,
   FileText,
   LockKeyhole,
   LogOut,
-  Radar,
-  RotateCcw,
   Send,
   Search,
-  ShieldAlert,
   ShieldCheck,
   UploadCloud
 } from "lucide-react";
@@ -34,60 +27,6 @@ const capabilities = [
   { icon: BrainCircuit, label: "Document Intelligence", value: "Extract parties, obligations, payment terms, dates, and exception language." },
   { icon: ShieldCheck, label: "Evidence Controls", value: "Retain signer identity, timestamps, file metadata, and workflow state." },
   { icon: LockKeyhole, label: "Least Privilege", value: "Users see only envelopes they own or have been asked to sign." }
-];
-
-const complianceChecks = [
-  {
-    label: "CIS Benchmark",
-    value: "96%",
-    detail: "Private compute, SQL public access disabled, WAF v2 edge protection, and diagnostic retention mapped to CIS-style controls."
-  },
-  {
-    label: "Azure Policy",
-    value: "92%",
-    detail: "SecureFlow policy initiative audits public IP exposure, SQL network posture, and gateway WAF configuration."
-  },
-  {
-    label: "Security Center",
-    value: "91%",
-    detail: "Defender for Cloud recommendation review tracks infrastructure hardening, patch posture, and monitoring coverage."
-  }
-];
-
-const recoveryChecks = [
-  {
-    label: "Azure Backup",
-    value: "Vault ready",
-    detail: "Recovery Services Vault with geo-redundant storage and daily VM backup policy for compute recovery."
-  },
-  {
-    label: "SQL PITR",
-    value: "14 days",
-    detail: "Azure SQL short-term retention supports point-in-time restore for accidental data changes."
-  },
-  {
-    label: "Restore Drill",
-    value: "Documented",
-    detail: "Runbook includes a delete-and-restore demonstration using a restored SQL database copy."
-  }
-];
-
-const aiSecuritySignals = [
-  {
-    label: "WAF Pattern Review",
-    value: "Normal",
-    detail: "Application Gateway firewall logs are scanned for repeated rule matches, blocked requests, and suspicious client concentration."
-  },
-  {
-    label: "Failed Login Burst",
-    value: "Watched",
-    detail: "Authentication failures are grouped by client signal to identify credential stuffing or brute-force behavior."
-  },
-  {
-    label: "API Traffic Spike",
-    value: "Guarded",
-    detail: "Log Analytics detects concentrated traffic against `/api/*` paths that resembles Layer 7 DoS behavior."
-  }
 ];
 
 export function App() {
@@ -241,18 +180,6 @@ export function App() {
               <span>{metric.label}</span>
             </div>
           ))}
-          <div className="metric metric--compliance">
-            <strong>93%</strong>
-            <span>Compliance Mode</span>
-          </div>
-          <div className="metric metric--resilience">
-            <strong>95%</strong>
-            <span>DR Readiness</span>
-          </div>
-          <div className="metric metric--ai">
-            <strong>AI</strong>
-            <span>Security Summary</span>
-          </div>
         </div>
       </section>
 
@@ -264,87 +191,6 @@ export function App() {
             <p>{value}</p>
           </article>
         ))}
-      </section>
-
-      <section className="compliance-mode" aria-label="Compliance mode">
-        <div className="compliance-score">
-          <p className="eyebrow">Enterprise audit posture</p>
-          <div>
-            <ClipboardCheck size={30} aria-hidden="true" />
-            <span>Compliant</span>
-          </div>
-          <strong>93%</strong>
-          <p>
-            Compliance Mode consolidates CIS benchmark alignment, Azure Policy results, and
-            Security Center recommendation review into one audit-ready operating view.
-          </p>
-        </div>
-        <div className="compliance-checks">
-          {complianceChecks.map((check) => (
-            <article key={check.label}>
-              <div>
-                <Radar size={20} aria-hidden="true" />
-                <h2>{check.label}</h2>
-              </div>
-              <strong>{check.value}</strong>
-              <p>{check.detail}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="resilience-mode" aria-label="Backup and disaster recovery">
-        <div className="resilience-score">
-          <p className="eyebrow">Backup and disaster recovery</p>
-          <div>
-            <DatabaseBackup size={30} aria-hidden="true" />
-            <span>Recovery Ready</span>
-          </div>
-          <strong>95%</strong>
-          <p>
-            SecureFlow combines Azure Backup policy coverage, SQL point-in-time restore,
-            and a rehearsed recovery procedure for accidental deletion or regional service disruption.
-          </p>
-        </div>
-        <div className="resilience-checks">
-          {recoveryChecks.map((check) => (
-            <article key={check.label}>
-              <div>
-                <RotateCcw size={20} aria-hidden="true" />
-                <h2>{check.label}</h2>
-              </div>
-              <strong>{check.value}</strong>
-              <p>{check.detail}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="ai-security-mode" aria-label="AI-powered log analysis">
-        <div className="ai-security-summary">
-          <p className="eyebrow">AI-powered log analysis</p>
-          <div>
-            <Bot size={30} aria-hidden="true" />
-            <span>AI Security Summary</span>
-          </div>
-          <strong>Active</strong>
-          <p>
-            Current signal: traffic remains within expected envelope. The active detector would flag
-            patterns resembling a Layer 7 DoS campaign targeting sensitive `/api/*` endpoints.
-          </p>
-        </div>
-        <div className="ai-security-checks">
-          {aiSecuritySignals.map((signal) => (
-            <article key={signal.label}>
-              <div>
-                {signal.label === "API Traffic Spike" ? <Activity size={20} aria-hidden="true" /> : <ShieldAlert size={20} aria-hidden="true" />}
-                <h2>{signal.label}</h2>
-              </div>
-              <strong>{signal.value}</strong>
-              <p>{signal.detail}</p>
-            </article>
-          ))}
-        </div>
       </section>
 
       <section className="documents">

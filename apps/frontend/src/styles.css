@@ -217,21 +217,6 @@ h1 {
   font-size: 1.8rem;
 }
 
-.metric--compliance {
-  background: #eff9f4;
-  color: #16372f;
-}
-
-.metric--resilience {
-  background: #fff6db;
-  color: #3d3213;
-}
-
-.metric--ai {
-  background: #e9f4ff;
-  color: #15304a;
-}
-
 .capabilities {
   display: grid;
   gap: 1rem;
@@ -259,141 +244,6 @@ h1 {
 .capabilities p {
   color: #52615d;
   line-height: 1.5;
-}
-
-.compliance-mode,
-.resilience-mode,
-.ai-security-mode {
-  background: #ffffff;
-  border-bottom: 1px solid #dbe3dc;
-  border-top: 1px solid #dbe3dc;
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.4fr);
-  padding: 3rem clamp(1rem, 5vw, 4rem);
-}
-
-.resilience-mode {
-  background: #f8faf7;
-  border-top: 0;
-}
-
-.ai-security-mode {
-  background: #ffffff;
-  border-top: 0;
-}
-
-.compliance-score,
-.compliance-checks article,
-.resilience-score,
-.resilience-checks article,
-.ai-security-summary,
-.ai-security-checks article {
-  border: 1px solid #dbe3dc;
-  border-radius: 8px;
-}
-
-.compliance-score,
-.resilience-score,
-.ai-security-summary {
-  background: #102d29;
-  color: #ffffff;
-  display: grid;
-  gap: 1rem;
-  padding: 1.4rem;
-}
-
-.resilience-score {
-  background: #273425;
-}
-
-.ai-security-summary {
-  background: #17324a;
-}
-
-.compliance-score > div,
-.compliance-checks article > div,
-.resilience-score > div,
-.resilience-checks article > div,
-.ai-security-summary > div,
-.ai-security-checks article > div {
-  align-items: center;
-  display: flex;
-  gap: 0.7rem;
-}
-
-.compliance-score > div,
-.resilience-score > div,
-.ai-security-summary > div {
-  color: #d8ebdf;
-  font-weight: 800;
-}
-
-.compliance-score strong,
-.resilience-score strong,
-.ai-security-summary strong {
-  color: #f2ce6b;
-  font-size: clamp(4rem, 10vw, 7rem);
-  line-height: 0.9;
-}
-
-.compliance-score p:last-child,
-.resilience-score p:last-child,
-.ai-security-summary p:last-child {
-  color: #d8e6e2;
-  line-height: 1.6;
-  margin-bottom: 0;
-}
-
-.compliance-checks,
-.resilience-checks,
-.ai-security-checks {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(3, minmax(180px, 1fr));
-}
-
-.compliance-checks article,
-.resilience-checks article,
-.ai-security-checks article {
-  background: #f8faf7;
-  display: grid;
-  gap: 0.9rem;
-  min-height: 230px;
-  padding: 1.1rem;
-}
-
-.resilience-checks article,
-.ai-security-checks article {
-  background: #ffffff;
-}
-
-.compliance-checks h2,
-.resilience-checks h2,
-.ai-security-checks h2 {
-  font-size: 1rem;
-  margin: 0;
-}
-
-.compliance-checks svg,
-.resilience-checks svg,
-.ai-security-checks svg {
-  color: #0f4c45;
-}
-
-.compliance-checks strong,
-.resilience-checks strong,
-.ai-security-checks strong {
-  color: #0f4c45;
-  font-size: 2.4rem;
-}
-
-.compliance-checks p,
-.resilience-checks p,
-.ai-security-checks p {
-  color: #52615d;
-  line-height: 1.5;
-  margin-bottom: 0;
 }
 
 .documents {
@@ -484,13 +334,7 @@ h1 {
 
 @media (max-width: 980px) {
   .hero,
-  .capabilities,
-  .compliance-mode,
-  .compliance-checks,
-  .resilience-mode,
-  .resilience-checks,
-  .ai-security-mode,
-  .ai-security-checks {
+  .capabilities {
     grid-template-columns: 1fr;
   }
 

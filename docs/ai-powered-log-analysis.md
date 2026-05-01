@@ -10,7 +10,7 @@ SecureFlow Docs includes an AI-assisted security analytics layer for WAF activit
 - Analytics engine: Log Analytics Kusto queries.
 - Alert: `alert-secureflow-dev-ai-api-traffic-spike`
 - Alert: `alert-secureflow-dev-ai-failed-login-burst`
-- UI panel: `AI Security Summary`
+- Presentation evidence: `AI Security Summary` generated from Azure monitoring signals
 
 This implementation uses deterministic anomaly rules that are easy to explain in a class demo. The summary can later be connected to Azure OpenAI or the OpenAI API for natural-language incident narrative generation.
 
@@ -74,7 +74,7 @@ FailedLoginRequests
 7. Show `alert-secureflow-dev-ai-api-traffic-spike`.
 8. Show `alert-secureflow-dev-ai-failed-login-burst`.
 9. Open the SecureFlow web app.
-10. Show the `AI Security Summary` section.
+10. Show the `AI Security Summary` evidence from this runbook and the Azure Monitor alert rules.
 
 ## CLI Validation
 
@@ -97,5 +97,5 @@ az monitor log-analytics query \
 - "This is not just monitoring; it is security signal interpretation."
 - "Application Gateway and WAF logs flow into Log Analytics."
 - "Kusto rules detect API traffic concentration and failed-login bursts."
-- "The UI summarizes those detections as an AI Security Summary for executives."
+- "The runbook summarizes those detections as an AI Security Summary for executives."
 - "A future enhancement can send the same query output to Azure OpenAI or OpenAI API to generate incident narratives automatically."
