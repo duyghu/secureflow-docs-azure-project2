@@ -17,6 +17,7 @@ public class AuthService {
 
   public static final String SESSION_USER = "secureflowUser";
   public static final String SESSION_CSRF = "secureflowCsrf";
+  private static final String DEFAULT_USER_EMAIL = "automission@company.com";
 
   private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
   private final SecureRandom secureRandom = new SecureRandom();
@@ -31,12 +32,15 @@ public class AuthService {
   @Bean
   CommandLineRunner defaultUser(UserRepository users) {
     return args -> {
-      if (!users.existsById("duyghu@company.com")) {
-        UserAccount user = new UserAccount();
-        user.setEmail("duyghu@company.com");
-        user.setPasswordHash(passwordEncoder.encode(initialPassword()));
-        users.save(user);
+      UserAccount user = users.findById(DEFAULT_USER_EMAIL).orElseGet(UserAccount::new);
+      boolean isNewUser = user.getEmail() == null || user.getEmail().isBlank();
+      if (isNewUser) {
+        user.setEmail(DEFAULT_USER_EMAIL);
       }
+      if (isNewUser || (defaultUserPassword != null && !defaultUserPassword.isBlank())) {
+        user.setPasswordHash(passwordEncoder.encode(initialPassword()));
+      }
+      users.save(user);
     };
   }
 

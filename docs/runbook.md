@@ -114,7 +114,7 @@ requests
 - Terraform created the WAF v2 Application Gateway, VMSS tiers, SQL private endpoint, Log Analytics, Application Insights, autoscale settings, and alerts in `group1_final`.
 - Ansible completed with zero failures against frontend, backend, and the ops-hosted SonarQube service.
 - Public gateway checks from the ops VM returned 200 for `/` and `/api/health`.
-- Authenticated gateway test uploaded `secureflow-test-contract.txt` and read it back from `/api/documents` for `duyghu@company.com`.
+- Authenticated gateway test uploaded `secureflow-test-contract.txt` and read it back from `/api/documents` for `automission@company.com`.
 
 ## Cost Monitoring
 

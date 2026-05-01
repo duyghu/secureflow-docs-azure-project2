@@ -229,7 +229,7 @@ Verified deployment on April 30, 2026:
 - `terraform apply`: complete, all resources in `group1_final`.
 - Ansible: common, SonarQube, frontend, and backend plays completed with zero failures.
 - App Gateway backend health: frontend `10.2.2.4` healthy, backend `10.2.3.4` healthy.
-- E2E API test through gateway from ops VM: login as `duyghu@company.com`, upload `secureflow-test-contract.txt`, read document ID `1`.
+- E2E API test through gateway from ops VM: login as `automission@company.com`, upload `secureflow-test-contract.txt`, read document ID `1`.
 - SonarQube: reachable on the ops VM at `http://127.0.0.1:9000`.
 
 ## Screenshots To Add For Submission
