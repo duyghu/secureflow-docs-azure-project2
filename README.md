@@ -40,7 +40,7 @@ docs/                         Architecture diagram and runbook
 - Compute tiers have no public IPs.
 - Azure SQL public network access is disabled.
 - SQL access is through Private Endpoint and Private DNS.
-- Application Insights, Log Analytics, diagnostic settings, and metric alerts are included.
+- Application Insights, Log Analytics, diagnostic settings, and metric alerts are included, with backend Java telemetry and frontend browser telemetry wired to the shared connection string.
 - Cost Management controls include a `$20` monthly resource-group budget, budget alerts, anomaly alerting, and a saved daily cost view.
 - Compliance Mode adds CIS-style Azure Policy checks, Security Center recommendation review, and a `93%` audit posture dashboard.
 - Backup and DR controls include Azure Backup vault/policy, SQL PITR/LTR, and Azure Portal recovery evidence.

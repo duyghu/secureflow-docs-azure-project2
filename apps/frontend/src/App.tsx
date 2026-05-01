@@ -20,6 +20,7 @@ import {
   logout,
   uploadDocument
 } from "./services/api";
+import { trackHandledError } from "./telemetry";
 
 const capabilities = [
   { icon: FileSignature, label: "Signature Routing", value: "Send contracts, approvals, and attestations to verified corporate signers." },
@@ -78,6 +79,7 @@ export function App() {
       setSession(nextSession);
       setDocuments(await listDocuments());
     } catch (err) {
+      trackHandledError(err, "login");
       setAuthError(err instanceof Error ? err.message : "Authentication failed");
     }
   }
@@ -96,6 +98,7 @@ export function App() {
       setSelectedFile(null);
       setIsUploadOpen(false);
     } catch (err) {
+      trackHandledError(err, "upload-document");
       setError(err instanceof Error ? err.message : "Unable to upload document");
     } finally {
       setIsSaving(false);
