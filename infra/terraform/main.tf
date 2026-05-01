@@ -16,6 +16,8 @@ data "azurerm_virtual_network" "main" {
   resource_group_name = data.azurerm_resource_group.main.name
 }
 
+data "azurerm_client_config" "current" {}
+
 module "network" {
   source              = "./modules/network"
   name_prefix         = local.name_prefix
@@ -60,6 +62,21 @@ module "compute" {
   admin_username           = var.admin_username
   ssh_public_key           = var.ssh_public_key
   tags                     = local.tags
+}
+
+module "key_vault" {
+  source                         = "./modules/key_vault"
+  name_prefix                    = local.name_prefix
+  location                       = data.azurerm_resource_group.main.location
+  resource_group_name            = data.azurerm_resource_group.main.name
+  resource_group_id              = data.azurerm_resource_group.main.id
+  tenant_id                      = data.azurerm_client_config.current.tenant_id
+  current_user_object_id         = var.key_vault_admin_object_id
+  subnet_id                      = module.network.data_subnet_id
+  vnet_id                        = data.azurerm_virtual_network.main.id
+  frontend_identity_principal_id = module.compute.frontend_identity_principal_id
+  backend_identity_principal_id  = module.compute.backend_identity_principal_id
+  tags                           = local.tags
 }
 
 module "monitoring" {

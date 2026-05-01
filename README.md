@@ -46,6 +46,7 @@ scripts/validate-gateway.sh   End-to-end App Gateway validation script
 - Compliance Mode adds CIS-style Azure Policy checks, Security Center recommendation review, and a `93%` audit posture dashboard.
 - Backup and DR controls include Azure Backup vault/policy, SQL PITR/LTR, and a `95%` recovery readiness dashboard.
 - AI-powered log analysis detects WAF/API traffic spikes and failed-login bursts, then presents an `AI Security Summary`.
+- Key Vault stores operational secrets behind a private endpoint with RBAC access for VMSS managed identities.
 
 ## Prerequisites
 
@@ -145,6 +146,7 @@ Acceptance proof checklist:
 - Compliance Mode exists: CIS benchmark controls, Azure Policy assignment, Security Center recommendations, and `93%` posture shown in the UI.
 - Backup and DR exists: Recovery Services Vault, VM backup policy, SQL PITR retention, SQL LTR policy, and recovery drill runbook.
 - AI log analysis exists: Log Analytics Kusto rules, scheduled query alerts, and AI Security Summary shown in the UI.
+- Key Vault exists: private endpoint, private DNS, secret inventory, and documented VMSS SSH jump-host access.
 
 Verified deployment on April 30, 2026:
 
@@ -174,6 +176,8 @@ Place evidence images in `docs/screenshots/`:
 - `ai-security-summary-ui.png`
 - `ai-log-alerts.png`
 - `waf-kusto-query.png`
+- `key-vault-secrets.png`
+- `vmss-ssh-through-ops.png`
 
 ## Short Demo
 
@@ -187,4 +191,5 @@ Place evidence images in `docs/screenshots/`:
 8. Show Compliance Mode from [docs/compliance-mode.md](docs/compliance-mode.md).
 9. Show Backup and DR from [docs/backup-disaster-recovery.md](docs/backup-disaster-recovery.md).
 10. Show AI-powered log analysis from [docs/ai-powered-log-analysis.md](docs/ai-powered-log-analysis.md).
-11. Show GitHub Actions workflows for Terraform and app deploy.
+11. Show Key Vault and private VMSS access from [docs/key-vault-and-vmss-access.md](docs/key-vault-and-vmss-access.md).
+12. Show GitHub Actions workflows for Terraform and app deploy.

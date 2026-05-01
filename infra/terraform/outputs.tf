@@ -70,3 +70,15 @@ output "ai_failed_login_burst_alert_name" {
 output "ai_security_summary_score" {
   value = module.monitoring.ai_security_summary_score
 }
+
+output "key_vault_name" {
+  value = module.key_vault.key_vault_name
+}
+
+output "key_vault_uri" {
+  value = module.key_vault.key_vault_uri
+}
+
+output "key_vault_private_endpoint_name" {
+  value = module.key_vault.key_vault_private_endpoint_name
+}

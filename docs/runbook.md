@@ -105,6 +105,7 @@ requests
 - Show Compliance Mode at `93%` with CIS-style Azure Policy checks and Security Center recommendations from `docs/compliance-mode.md`.
 - Show Backup and DR at `95%` with Azure Backup, SQL PITR, and the restore drill from `docs/backup-disaster-recovery.md`.
 - Show AI Security Summary with WAF/API anomaly detection and failed-login burst analysis from `docs/ai-powered-log-analysis.md`.
+- Show Key Vault secret storage and VMSS SSH access through the ops VM from `docs/key-vault-and-vmss-access.md`.
 - Show GitHub Actions workflows for infrastructure and independent app deploys.
 
 ## Verified Result
@@ -158,3 +159,23 @@ Terraform creates:
 - AI Security Summary UI panel.
 
 Use [ai-powered-log-analysis.md](ai-powered-log-analysis.md) for Kusto queries, alert validation, and the security operations demo script.
+
+## Key Vault and VMSS Access
+
+Terraform creates:
+
+- A private Azure Key Vault with RBAC authorization.
+- Key Vault private endpoint in `snet-data`.
+- Private DNS zone `privatelink.vaultcore.azure.net`.
+- Key Vault secret access for frontend and backend VMSS managed identities.
+
+VMSS SSH access uses the ops VM as a jump host:
+
+```bash
+ssh -i /Users/duyguu16/Desktop/group1-final_key.pem \
+  -o StrictHostKeyChecking=no \
+  -o ProxyCommand='ssh -i /Users/duyguu16/Desktop/group1-final_key.pem -o StrictHostKeyChecking=no -W %h:%p azureuser@4.223.163.109' \
+  azureuser@10.2.2.4
+```
+
+Use [key-vault-and-vmss-access.md](key-vault-and-vmss-access.md) for secret names and full SSH commands.

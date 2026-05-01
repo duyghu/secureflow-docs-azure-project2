@@ -56,6 +56,12 @@ variable "alert_email" {
   description = "Email address for Azure Monitor action group."
 }
 
+variable "key_vault_admin_object_id" {
+  type        = string
+  description = "Azure AD object ID granted Key Vault Administrator for demo secret management."
+  default     = "c18c6b19-6b8b-43eb-a9cd-2afa005b01e4"
+}
+
 variable "monthly_budget_amount" {
   type        = number
   description = "Monthly Azure Cost Management budget amount for the project resource group."
