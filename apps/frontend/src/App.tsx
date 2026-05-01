@@ -37,8 +37,8 @@ export function App() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
-  const [email, setEmail] = useState("duyghu@company.com");
-  const [password, setPassword] = useState("duygu");
+  const [email, setEmail] = useState("automission@company.com");
+  const [password, setPassword] = useState("auto");
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [category, setCategory] = useState("Contract");
