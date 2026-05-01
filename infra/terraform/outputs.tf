@@ -15,6 +15,10 @@ output "backend_vmss_name" {
   value = module.compute.backend_vmss_name
 }
 
+output "bastion_host_name" {
+  value = module.bastion.bastion_host_name
+}
+
 output "sql_private_endpoint_fqdn" {
   value = module.database.sql_private_fqdn
 }

@@ -12,7 +12,7 @@ on:
 
 jobs:
   build-test-scan-package:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, secureflow-ops]
     defaults:
       run:
         working-directory: apps/backend
@@ -22,23 +22,15 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "21"
-          cache: "maven"
 
       - name: Test and package
         run: mvn -B clean verify
 
       - name: SonarQube scan
-        if: ${{ env.SONAR_TOKEN != '' && env.OPS_HOST != '' && env.OPS_SSH_KEY != '' }}
+        if: ${{ env.SONAR_TOKEN != '' }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          OPS_HOST: ${{ secrets.OPS_HOST }}
-          OPS_USER: ${{ secrets.OPS_USER || 'azureuser' }}
-          OPS_SSH_KEY: ${{ secrets.OPS_SSH_KEY }}
         run: |
-          install -m 700 -d ~/.ssh
-          printf '%s\n' "$OPS_SSH_KEY" > ~/.ssh/ops_key
-          chmod 600 ~/.ssh/ops_key
-          ssh -f -N -L 9000:127.0.0.1:9000 -i ~/.ssh/ops_key -o StrictHostKeyChecking=no "$OPS_USER@$OPS_HOST"
           mvn -B sonar:sonar \
             -Dsonar.projectKey=secureflow-docs-azure-project2 \
             -Dsonar.projectName="SecureFlow Docs Azure Project 2" \
@@ -53,7 +45,7 @@ jobs:
   deploy:
     needs: build-test-scan-package
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, secureflow-ops]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -61,25 +53,9 @@ jobs:
           name: secureflow-backend
           path: apps/backend/target
 
-      - name: Copy deployment files to ops VM
+      - name: Deploy backend from self-hosted ops runner
         env:
-          OPS_HOST: ${{ secrets.OPS_HOST }}
-          OPS_USER: ${{ secrets.OPS_USER || 'azureuser' }}
           OPS_SSH_KEY: ${{ secrets.OPS_SSH_KEY }}
-        run: |
-          install -m 700 -d ~/.ssh
-          printf '%s\n' "$OPS_SSH_KEY" > ~/.ssh/ops_key
-          chmod 600 ~/.ssh/ops_key
-          ssh -i ~/.ssh/ops_key -o StrictHostKeyChecking=no "$OPS_USER@$OPS_HOST" "mkdir -p ~/secureflow-deploy/apps/backend/target ~/secureflow-deploy/config ~/.ssh && chmod 700 ~/.ssh"
-          scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no ~/.ssh/ops_key "$OPS_USER@$OPS_HOST:~/.ssh/group1-final_key.pem"
-          ssh -i ~/.ssh/ops_key -o StrictHostKeyChecking=no "$OPS_USER@$OPS_HOST" "chmod 600 ~/.ssh/group1-final_key.pem"
-          scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no apps/backend/target/secureflow-docs-backend-0.1.0.jar "$OPS_USER@$OPS_HOST:~/secureflow-deploy/apps/backend/target/secureflow-docs-backend-0.1.0.jar"
-          scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no -r config/ansible "$OPS_USER@$OPS_HOST:~/secureflow-deploy/config/"
-
-      - name: Deploy backend from ops VM
-        env:
-          OPS_HOST: ${{ secrets.OPS_HOST }}
-          OPS_USER: ${{ secrets.OPS_USER || 'azureuser' }}
           SQL_SERVER_FQDN: ${{ secrets.SQL_SERVER_FQDN }}
           SQL_DATABASE_NAME: ${{ secrets.SQL_DATABASE_NAME || 'sqldb-secureflow-docs' }}
           SQL_ADMIN_LOGIN: ${{ secrets.SQL_ADMIN_LOGIN || 'secureflowadmin' }}
@@ -87,11 +63,18 @@ jobs:
           APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
           SECUREFLOW_DEFAULT_PASSWORD: ${{ secrets.SECUREFLOW_DEFAULT_PASSWORD }}
         run: |
-          ssh -i ~/.ssh/ops_key -o StrictHostKeyChecking=no "$OPS_USER@$OPS_HOST" "
-            set -e
-            cd ~/secureflow-deploy
-            sudo apt-get update
-            sudo apt-get install -y ansible python3-pip
-            ansible-galaxy collection install -r config/ansible/requirements.yml
-            ANSIBLE_HOST_KEY_CHECKING=False SQL_SERVER_FQDN='$SQL_SERVER_FQDN' SQL_DATABASE_NAME='$SQL_DATABASE_NAME' SQL_ADMIN_LOGIN='$SQL_ADMIN_LOGIN' SQL_ADMIN_PASSWORD='$SQL_ADMIN_PASSWORD' APPLICATIONINSIGHTS_CONNECTION_STRING='$APPLICATIONINSIGHTS_CONNECTION_STRING' SECUREFLOW_DEFAULT_PASSWORD='$SECUREFLOW_DEFAULT_PASSWORD' BACKEND_ARTIFACT=/home/azureuser/secureflow-deploy/apps/backend/target/secureflow-docs-backend-0.1.0.jar ansible-playbook config/ansible/site.yml --limit backend -i config/ansible/inventories/prod/hosts.ini --private-key ~/.ssh/group1-final_key.pem
-          "
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$OPS_SSH_KEY" > ~/.ssh/group1-final_key.pem
+          chmod 600 ~/.ssh/group1-final_key.pem
+          sudo apt-get update
+          sudo apt-get install -y ansible python3-pip
+          ansible-galaxy collection install -r config/ansible/requirements.yml
+          ANSIBLE_HOST_KEY_CHECKING=False \
+            SQL_SERVER_FQDN="$SQL_SERVER_FQDN" \
+            SQL_DATABASE_NAME="$SQL_DATABASE_NAME" \
+            SQL_ADMIN_LOGIN="$SQL_ADMIN_LOGIN" \
+            SQL_ADMIN_PASSWORD="$SQL_ADMIN_PASSWORD" \
+            APPLICATIONINSIGHTS_CONNECTION_STRING="$APPLICATIONINSIGHTS_CONNECTION_STRING" \
+            SECUREFLOW_DEFAULT_PASSWORD="$SECUREFLOW_DEFAULT_PASSWORD" \
+            BACKEND_ARTIFACT="$GITHUB_WORKSPACE/apps/backend/target/secureflow-docs-backend-0.1.0.jar" \
+            ansible-playbook config/ansible/site.yml --limit backend -i config/ansible/inventories/prod/hosts.ini --private-key ~/.ssh/group1-final_key.pem

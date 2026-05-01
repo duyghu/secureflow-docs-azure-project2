@@ -46,6 +46,7 @@ docs/                         Architecture diagram and runbook
 - Backup and DR controls include Azure Backup vault/policy, SQL PITR/LTR, and Azure Portal recovery evidence.
 - AI-powered log analysis detects WAF/API traffic spikes and failed-login bursts, then presents an `AI Security Summary`.
 - Key Vault stores operational secrets behind a private endpoint with RBAC access for VMSS managed identities.
+- A self-hosted GitHub Actions runner runs on the ops VM, and Azure Bastion Developer is managed by Terraform for private administrative access.
 
 ## Prerequisites
 

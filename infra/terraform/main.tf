@@ -64,6 +64,15 @@ module "compute" {
   tags                     = local.tags
 }
 
+module "bastion" {
+  source              = "./modules/bastion"
+  name                = "${var.vnet_name}-bastion"
+  location            = data.azurerm_resource_group.main.location
+  resource_group_name = data.azurerm_resource_group.main.name
+  virtual_network_id  = data.azurerm_virtual_network.main.id
+  tags                = local.tags
+}
+
 module "key_vault" {
   source                         = "./modules/key_vault"
   name_prefix                    = local.name_prefix
