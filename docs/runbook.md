@@ -48,7 +48,7 @@ GitHub Actions automates this through `.github/workflows/frontend.yml` and `.git
 ## Validate
 
 ```bash
-scripts/validate-gateway.sh https://135.116.238.100
+curl -k https://135.116.238.100/
 ```
 
 Expected proof:

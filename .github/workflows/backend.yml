@@ -70,12 +70,11 @@ jobs:
           install -m 700 -d ~/.ssh
           printf '%s\n' "$OPS_SSH_KEY" > ~/.ssh/ops_key
           chmod 600 ~/.ssh/ops_key
-          ssh -i ~/.ssh/ops_key -o StrictHostKeyChecking=no "$OPS_USER@$OPS_HOST" "mkdir -p ~/secureflow-deploy/apps/backend/target ~/secureflow-deploy/config ~/secureflow-deploy/scripts ~/.ssh && chmod 700 ~/.ssh"
+          ssh -i ~/.ssh/ops_key -o StrictHostKeyChecking=no "$OPS_USER@$OPS_HOST" "mkdir -p ~/secureflow-deploy/apps/backend/target ~/secureflow-deploy/config ~/.ssh && chmod 700 ~/.ssh"
           scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no ~/.ssh/ops_key "$OPS_USER@$OPS_HOST:~/.ssh/group1-final_key.pem"
           ssh -i ~/.ssh/ops_key -o StrictHostKeyChecking=no "$OPS_USER@$OPS_HOST" "chmod 600 ~/.ssh/group1-final_key.pem"
           scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no apps/backend/target/secureflow-docs-backend-0.1.0.jar "$OPS_USER@$OPS_HOST:~/secureflow-deploy/apps/backend/target/secureflow-docs-backend-0.1.0.jar"
           scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no -r config/ansible "$OPS_USER@$OPS_HOST:~/secureflow-deploy/config/"
-          scp -i ~/.ssh/ops_key -o StrictHostKeyChecking=no -r scripts "$OPS_USER@$OPS_HOST:~/secureflow-deploy/"
 
       - name: Deploy backend from ops VM
         env:

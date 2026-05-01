@@ -24,7 +24,6 @@ apps/frontend/                React + TypeScript + Vite frontend
 apps/backend/                 Java 21 Spring Boot + Maven REST API
 .github/workflows/            Infrastructure, frontend, and backend automation
 docs/                         Architecture diagram and runbook
-scripts/validate-gateway.sh   End-to-end App Gateway validation script
 ```
 
 ## Azure Architecture
@@ -127,7 +126,7 @@ Frontend and backend are intentionally independent deployables.
 After deployment, run:
 
 ```bash
-scripts/validate-gateway.sh https://135.116.238.100
+curl -k https://135.116.238.100/
 ```
 
 Acceptance proof checklist:
