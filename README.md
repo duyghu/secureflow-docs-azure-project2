@@ -148,6 +148,74 @@ Acceptance proof checklist:
 - AI log analysis exists: Log Analytics Kusto rules, scheduled query alerts, and AI Security Summary evidence in Azure monitoring docs.
 - Key Vault exists: private endpoint, private DNS, secret inventory, and documented VMSS SSH jump-host access.
 
+## Azure Dashboard Snapshot
+
+The project includes a dashboard-style monitoring snapshot for submission:
+
+![Azure operations dashboard snapshot](docs/screenshots/azure-dashboard-snapshot.svg)
+
+This snapshot summarizes the Azure operations view used in the demo: Application Gateway WAF health, Log Analytics diagnostics, Application Insights telemetry, alerts, cost controls, compliance posture, backup/DR, private access, and automation status.
+
+## Kusto Queries
+
+Run these in Azure Portal at **Log Analytics workspaces** > `law-secureflow-dev` > **Logs**.
+
+Application Gateway access logs:
+
+```kusto
+AzureDiagnostics
+| where ResourceType == "APPLICATIONGATEWAYS"
+| where Category == "ApplicationGatewayAccessLog"
+| project TimeGenerated, clientIP_s, requestUri_s, httpStatus_d
+| order by TimeGenerated desc
+```
+
+Application Gateway WAF blocks:
+
+```kusto
+AzureDiagnostics
+| where Category == "ApplicationGatewayFirewallLog"
+| summarize Blocks=count() by ruleId_s, Message
+| order by Blocks desc
+```
+
+Application request failures from Application Insights:
+
+```kusto
+requests
+| where cloud_RoleName contains "secureflow"
+| summarize failures=countif(success == false), total=count() by bin(timestamp, 5m)
+```
+
+API traffic spike detection:
+
+```kusto
+AzureDiagnostics
+| where TimeGenerated > ago(10m)
+| where Category in ("ApplicationGatewayAccessLog", "ApplicationGatewayFirewallLog")
+| extend RequestUri = tostring(column_ifexists("requestUri_s", ""))
+| extend ClientIP = tostring(column_ifexists("clientIP_s", "unknown"))
+| where RequestUri startswith "/api"
+| summarize RequestCount = count() by bin(TimeGenerated, 5m), ClientIP, RequestUri
+| where RequestCount > 100
+```
+
+Failed login burst detection:
+
+```kusto
+let FailedLoginRequests = union isfuzzy=true
+  (requests
+    | project TimeGenerated = timestamp, Url = tostring(url), ResultCode = tostring(resultCode), ClientIP = tostring(client_IP)),
+  (AppRequests
+    | project TimeGenerated, Url = tostring(Url), ResultCode = tostring(ResultCode), ClientIP = tostring(ClientIP));
+FailedLoginRequests
+| where TimeGenerated > ago(10m)
+| where Url has "/api/auth/login"
+| where ResultCode in ("401", "403")
+| summarize FailedAttempts = count() by bin(TimeGenerated, 5m), ClientIP
+| where FailedAttempts > 5
+```
+
 Verified deployment on April 30, 2026:
 
 - `terraform apply`: complete, all resources in `group1_final`.
@@ -164,6 +232,7 @@ Place evidence images in `docs/screenshots/`:
 - `resource-group.png`
 - `app-gateway-backend-health.png`
 - `sql-private-endpoint.png`
+- `azure-dashboard-snapshot.svg`
 - `alerts-dashboard.png`
 - `cost-management-budget.png`
 - `cost-analysis-view.png`
