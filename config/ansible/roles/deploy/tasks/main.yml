@@ -7,6 +7,21 @@
     group: www-data
     mode: "0755"
 
+- name: Clear previous frontend build
+  ansible.builtin.file:
+    path: /var/www/html
+    state: absent
+  when: app_component == "frontend"
+
+- name: Recreate frontend web root
+  ansible.builtin.file:
+    path: /var/www/html
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: "0755"
+  when: app_component == "frontend"
+
 - name: Copy frontend artifact
   ansible.builtin.unarchive:
     src: "{{ lookup('env', 'FRONTEND_ARTIFACT') | default('../../../apps/frontend/dist.tar.gz', true) }}"
@@ -29,6 +44,12 @@
 
         location / {
           try_files $uri /index.html;
+          add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate" always;
+        }
+
+        location /assets/ {
+          try_files $uri =404;
+          add_header Cache-Control "public, max-age=31536000, immutable" always;
         }
 
         location /health {

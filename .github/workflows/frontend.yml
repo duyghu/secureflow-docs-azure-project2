@@ -5,10 +5,14 @@ on:
     branches: ["main"]
     paths:
       - "apps/frontend/**"
+      - "config/ansible/**"
+      - "scripts/**"
       - ".github/workflows/frontend.yml"
   pull_request:
     paths:
       - "apps/frontend/**"
+      - "config/ansible/**"
+      - "scripts/**"
 
 jobs:
   build-scan-package:
