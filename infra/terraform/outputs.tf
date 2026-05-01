@@ -58,3 +58,15 @@ output "sql_pitr_retention_days" {
 output "dr_readiness_score" {
   value = module.resilience.dr_readiness_score
 }
+
+output "ai_api_traffic_spike_alert_name" {
+  value = module.monitoring.ai_api_traffic_spike_alert_name
+}
+
+output "ai_failed_login_burst_alert_name" {
+  value = module.monitoring.ai_failed_login_burst_alert_name
+}
+
+output "ai_security_summary_score" {
+  value = module.monitoring.ai_security_summary_score
+}

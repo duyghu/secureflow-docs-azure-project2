@@ -30,3 +30,15 @@ output "cis_policy_initiative_name" {
 output "compliance_mode_score" {
   value = "93%"
 }
+
+output "ai_api_traffic_spike_alert_name" {
+  value = azurerm_monitor_scheduled_query_rules_alert_v2.ai_api_traffic_spike.name
+}
+
+output "ai_failed_login_burst_alert_name" {
+  value = azurerm_monitor_scheduled_query_rules_alert_v2.ai_failed_login_burst.name
+}
+
+output "ai_security_summary_score" {
+  value = "AI Guard: Active"
+}

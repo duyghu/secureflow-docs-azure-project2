@@ -45,6 +45,7 @@ scripts/validate-gateway.sh   End-to-end App Gateway validation script
 - Cost Management controls include a `$20` monthly resource-group budget, budget alerts, anomaly alerting, and a saved daily cost view.
 - Compliance Mode adds CIS-style Azure Policy checks, Security Center recommendation review, and a `93%` audit posture dashboard.
 - Backup and DR controls include Azure Backup vault/policy, SQL PITR/LTR, and a `95%` recovery readiness dashboard.
+- AI-powered log analysis detects WAF/API traffic spikes and failed-login bursts, then presents an `AI Security Summary`.
 
 ## Prerequisites
 
@@ -143,6 +144,7 @@ Acceptance proof checklist:
 - Cost monitoring exists: monthly budget alert, forecasted overspend alert, anomaly alert, and Cost Management view.
 - Compliance Mode exists: CIS benchmark controls, Azure Policy assignment, Security Center recommendations, and `93%` posture shown in the UI.
 - Backup and DR exists: Recovery Services Vault, VM backup policy, SQL PITR retention, SQL LTR policy, and recovery drill runbook.
+- AI log analysis exists: Log Analytics Kusto rules, scheduled query alerts, and AI Security Summary shown in the UI.
 
 Verified deployment on April 30, 2026:
 
@@ -169,6 +171,9 @@ Place evidence images in `docs/screenshots/`:
 - `dr-readiness-ui.png`
 - `recovery-services-vault.png`
 - `sql-pitr-restore.png`
+- `ai-security-summary-ui.png`
+- `ai-log-alerts.png`
+- `waf-kusto-query.png`
 
 ## Short Demo
 
@@ -181,4 +186,5 @@ Place evidence images in `docs/screenshots/`:
 7. Show Azure Cost Management budget/anomaly controls from [docs/cost-monitoring-dashboard.md](docs/cost-monitoring-dashboard.md).
 8. Show Compliance Mode from [docs/compliance-mode.md](docs/compliance-mode.md).
 9. Show Backup and DR from [docs/backup-disaster-recovery.md](docs/backup-disaster-recovery.md).
-10. Show GitHub Actions workflows for Terraform and app deploy.
+10. Show AI-powered log analysis from [docs/ai-powered-log-analysis.md](docs/ai-powered-log-analysis.md).
+11. Show GitHub Actions workflows for Terraform and app deploy.

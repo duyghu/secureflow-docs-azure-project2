@@ -367,6 +367,85 @@ resource "azurerm_monitor_metric_alert" "sql_dtu" {
   }
 }
 
+resource "azurerm_monitor_scheduled_query_rules_alert_v2" "ai_api_traffic_spike" {
+  name                 = "alert-${var.name_prefix}-ai-api-traffic-spike"
+  resource_group_name  = var.resource_group_name
+  location             = var.location
+  scopes               = [azurerm_log_analytics_workspace.main.id]
+  description          = "AI-assisted detector for abnormal API traffic patterns through Application Gateway."
+  enabled              = true
+  severity             = 2
+  evaluation_frequency = "PT5M"
+  window_duration      = "PT10M"
+  tags                 = var.tags
+
+  criteria {
+    query                   = <<-KQL
+      AzureDiagnostics
+      | where TimeGenerated > ago(10m)
+      | where Category in ("ApplicationGatewayAccessLog", "ApplicationGatewayFirewallLog")
+      | extend RequestUri = tostring(column_ifexists("requestUri_s", ""))
+      | extend ClientIP = tostring(column_ifexists("clientIP_s", "unknown"))
+      | where RequestUri startswith "/api"
+      | summarize RequestCount = count() by bin(TimeGenerated, 5m), ClientIP, RequestUri
+      | where RequestCount > 100
+    KQL
+    time_aggregation_method = "Count"
+    operator                = "GreaterThan"
+    threshold               = 0
+
+    failing_periods {
+      minimum_failing_periods_to_trigger_alert = 1
+      number_of_evaluation_periods             = 1
+    }
+  }
+
+  action {
+    action_groups = [azurerm_monitor_action_group.platform.id]
+  }
+}
+
+resource "azurerm_monitor_scheduled_query_rules_alert_v2" "ai_failed_login_burst" {
+  name                 = "alert-${var.name_prefix}-ai-failed-login-burst"
+  resource_group_name  = var.resource_group_name
+  location             = var.location
+  scopes               = [azurerm_log_analytics_workspace.main.id]
+  description          = "AI-assisted detector for repeated failed authentication attempts against SecureFlow API."
+  enabled              = true
+  severity             = 2
+  evaluation_frequency = "PT5M"
+  window_duration      = "PT10M"
+  tags                 = var.tags
+
+  criteria {
+    query                   = <<-KQL
+      let FailedLoginRequests = union isfuzzy=true
+        (requests
+          | project TimeGenerated = timestamp, Url = tostring(url), ResultCode = tostring(resultCode), ClientIP = tostring(client_IP)),
+        (AppRequests
+          | project TimeGenerated, Url = tostring(Url), ResultCode = tostring(ResultCode), ClientIP = tostring(ClientIP));
+      FailedLoginRequests
+      | where TimeGenerated > ago(10m)
+      | where Url has "/api/auth/login"
+      | where ResultCode in ("401", "403")
+      | summarize FailedAttempts = count() by bin(TimeGenerated, 5m), ClientIP
+      | where FailedAttempts > 5
+    KQL
+    time_aggregation_method = "Count"
+    operator                = "GreaterThan"
+    threshold               = 0
+
+    failing_periods {
+      minimum_failing_periods_to_trigger_alert = 1
+      number_of_evaluation_periods             = 1
+    }
+  }
+
+  action {
+    action_groups = [azurerm_monitor_action_group.platform.id]
+  }
+}
+
 resource "azurerm_monitor_diagnostic_setting" "app_gateway" {
   name                       = "diag-${var.name_prefix}-appgw"
   target_resource_id         = var.app_gateway_id

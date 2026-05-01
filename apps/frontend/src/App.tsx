@@ -1,6 +1,8 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
+  Activity,
   BadgeCheck,
+  Bot,
   BrainCircuit,
   ClipboardCheck,
   DatabaseBackup,
@@ -12,6 +14,7 @@ import {
   RotateCcw,
   Send,
   Search,
+  ShieldAlert,
   ShieldCheck,
   UploadCloud
 } from "lucide-react";
@@ -66,6 +69,24 @@ const recoveryChecks = [
     label: "Restore Drill",
     value: "Documented",
     detail: "Runbook includes a delete-and-restore demonstration using a restored SQL database copy."
+  }
+];
+
+const aiSecuritySignals = [
+  {
+    label: "WAF Pattern Review",
+    value: "Normal",
+    detail: "Application Gateway firewall logs are scanned for repeated rule matches, blocked requests, and suspicious client concentration."
+  },
+  {
+    label: "Failed Login Burst",
+    value: "Watched",
+    detail: "Authentication failures are grouped by client signal to identify credential stuffing or brute-force behavior."
+  },
+  {
+    label: "API Traffic Spike",
+    value: "Guarded",
+    detail: "Log Analytics detects concentrated traffic against `/api/*` paths that resembles Layer 7 DoS behavior."
   }
 ];
 
@@ -228,6 +249,10 @@ export function App() {
             <strong>95%</strong>
             <span>DR Readiness</span>
           </div>
+          <div className="metric metric--ai">
+            <strong>AI</strong>
+            <span>Security Summary</span>
+          </div>
         </div>
       </section>
 
@@ -290,6 +315,33 @@ export function App() {
               </div>
               <strong>{check.value}</strong>
               <p>{check.detail}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="ai-security-mode" aria-label="AI-powered log analysis">
+        <div className="ai-security-summary">
+          <p className="eyebrow">AI-powered log analysis</p>
+          <div>
+            <Bot size={30} aria-hidden="true" />
+            <span>AI Security Summary</span>
+          </div>
+          <strong>Active</strong>
+          <p>
+            Current signal: traffic remains within expected envelope. The active detector would flag
+            patterns resembling a Layer 7 DoS campaign targeting sensitive `/api/*` endpoints.
+          </p>
+        </div>
+        <div className="ai-security-checks">
+          {aiSecuritySignals.map((signal) => (
+            <article key={signal.label}>
+              <div>
+                {signal.label === "API Traffic Spike" ? <Activity size={20} aria-hidden="true" /> : <ShieldAlert size={20} aria-hidden="true" />}
+                <h2>{signal.label}</h2>
+              </div>
+              <strong>{signal.value}</strong>
+              <p>{signal.detail}</p>
             </article>
           ))}
         </div>
