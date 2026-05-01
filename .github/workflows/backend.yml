@@ -67,7 +67,7 @@ jobs:
           OPS_SSH_KEY: ${{ secrets.OPS_SSH_KEY }}
           KEY_VAULT_URI: ${{ vars.KEY_VAULT_URI || 'https://kv-sfdocs-29c28e.vault.azure.net/' }}
           SQL_SERVER_FQDN: ${{ vars.SQL_SERVER_FQDN || 'sql-secureflow-dev.database.windows.net' }}
-          SQL_DATABASE_NAME: ${{ secrets.SQL_DATABASE_NAME || 'sqldb-secureflow-docs' }}
+          SQL_DATABASE_NAME: ${{ vars.SQL_DATABASE_NAME || 'sqldb-secureflow-docs' }}
         run: |
           install -m 700 -d ~/.ssh
           printf '%s\n' "$OPS_SSH_KEY" > ~/.ssh/group1-final_key.pem
