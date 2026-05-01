@@ -79,6 +79,7 @@
       SPRING_DATASOURCE_USERNAME={{ lookup('env', 'SQL_ADMIN_LOGIN') | default('secureflowadmin', true) }}
       SPRING_DATASOURCE_PASSWORD={{ lookup('env', 'SQL_ADMIN_PASSWORD') }}
       APPLICATIONINSIGHTS_CONNECTION_STRING={{ lookup('env', 'APPLICATIONINSIGHTS_CONNECTION_STRING') | default('', true) }}
+      SECUREFLOW_DEFAULT_PASSWORD={{ lookup('env', 'SECUREFLOW_DEFAULT_PASSWORD') | default('', true) }}
   no_log: true
   when: app_component == "backend"
 

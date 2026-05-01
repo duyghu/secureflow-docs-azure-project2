@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class DocumentService {
 
-  private static final long MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+  private static final long MAX_UPLOAD_BYTES = 10L * 1024 * 1024;
 
   private final DocumentRepository repository;
 

@@ -7,6 +7,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Map;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,9 +21,11 @@ public class AuthService {
   private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
   private final SecureRandom secureRandom = new SecureRandom();
   private final UserRepository userRepository;
+  private final String defaultUserPassword;
 
-  public AuthService(UserRepository userRepository) {
+  public AuthService(UserRepository userRepository, @Value("${secureflow.default-user.password:}") String defaultUserPassword) {
     this.userRepository = userRepository;
+    this.defaultUserPassword = defaultUserPassword;
   }
 
   @Bean
@@ -31,7 +34,7 @@ public class AuthService {
       if (!users.existsById("duyghu@company.com")) {
         UserAccount user = new UserAccount();
         user.setEmail("duyghu@company.com");
-        user.setPasswordHash(passwordEncoder.encode("duygu"));
+        user.setPasswordHash(passwordEncoder.encode(initialPassword()));
         users.save(user);
       }
     };
@@ -81,5 +84,14 @@ public class AuthService {
     byte[] token = new byte[32];
     secureRandom.nextBytes(token);
     return Base64.getUrlEncoder().withoutPadding().encodeToString(token);
+  }
+
+  private String initialPassword() {
+    if (defaultUserPassword != null && !defaultUserPassword.isBlank()) {
+      return defaultUserPassword;
+    }
+    byte[] password = new byte[24];
+    secureRandom.nextBytes(password);
+    return Base64.getUrlEncoder().withoutPadding().encodeToString(password);
   }
 }

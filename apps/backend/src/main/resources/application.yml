@@ -39,3 +39,7 @@ management:
 applicationinsights:
   connection:
     string: ${APPLICATIONINSIGHTS_CONNECTION_STRING:}
+
+secureflow:
+  default-user:
+    password: ${SECUREFLOW_DEFAULT_PASSWORD:}
