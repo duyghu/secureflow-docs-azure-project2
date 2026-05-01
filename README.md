@@ -122,6 +122,14 @@ ansible-playbook config/ansible/site.yml -i config/ansible/inventories/prod/host
 
 Frontend and backend are intentionally independent deployables.
 
+## Automation Evidence
+
+- Terraform runs from a fresh GitHub Actions checkout on the self-hosted runner, initializes the remote backend, validates, plans, and applies infrastructure with `terraform_action=apply`.
+- Remote state is stored in Azure Storage, so the workflow can start from a clean runner workspace while preserving real infrastructure state.
+- Ansible configures machines idempotently through `config/ansible/site.yml`; reruns converge package, service, nginx, backend, and SonarQube configuration instead of requiring manual server edits.
+- Frontend and backend deploy independently through GitHub Actions after build/test/package steps.
+- The self-hosted runner `secureflow-ops-runner` performs Terraform and Ansible automation from the ops VM, which can reach the private VMSS instances.
+
 ## Validate
 
 After deployment, run:
