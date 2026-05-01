@@ -68,6 +68,44 @@
     mode: "0644"
   when: app_component == "backend"
 
+- name: Request Key Vault access token with VM managed identity
+  ansible.builtin.uri:
+    url: "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://vault.azure.net"
+    method: GET
+    headers:
+      Metadata: "true"
+    return_content: true
+  register: key_vault_token_response
+  no_log: true
+  when: app_component == "backend"
+
+- name: Fetch backend secrets from Key Vault with managed identity
+  ansible.builtin.uri:
+    url: "{{ lookup('env', 'KEY_VAULT_URI') | default('https://kv-sfdocs-29c28e.vault.azure.net/', true) | regex_replace('/$', '') }}/secrets/{{ item.key_vault_name }}?api-version=7.4"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ key_vault_token_response.json.access_token }}"
+    return_content: true
+  loop:
+    - key_vault_name: sql-admin-login
+      fact_name: sql_admin_login
+    - key_vault_name: sql-admin-password
+      fact_name: sql_admin_password
+    - key_vault_name: application-insights-connection-string
+      fact_name: applicationinsights_connection_string
+    - key_vault_name: secureflow-default-password
+      fact_name: secureflow_default_password
+  register: backend_key_vault_secret_results
+  no_log: true
+  when: app_component == "backend"
+
+- name: Store backend Key Vault secrets as deployment facts
+  ansible.builtin.set_fact:
+    backend_key_vault_secrets: "{{ backend_key_vault_secrets | default({}) | combine({item.item.fact_name: item.json.value}) }}"
+  loop: "{{ backend_key_vault_secret_results.results }}"
+  no_log: true
+  when: app_component == "backend"
+
 - name: Create backend environment file
   ansible.builtin.copy:
     dest: /etc/secureflow-api.env
@@ -76,10 +114,10 @@
     mode: "0600"
     content: |
       SPRING_DATASOURCE_URL=jdbc:sqlserver://{{ lookup('env', 'SQL_SERVER_FQDN') }}:1433;database={{ lookup('env', 'SQL_DATABASE_NAME') | default('sqldb-secureflow-docs', true) }};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;
-      SPRING_DATASOURCE_USERNAME={{ lookup('env', 'SQL_ADMIN_LOGIN') | default('secureflowadmin', true) }}
-      SPRING_DATASOURCE_PASSWORD={{ lookup('env', 'SQL_ADMIN_PASSWORD') }}
-      APPLICATIONINSIGHTS_CONNECTION_STRING={{ lookup('env', 'APPLICATIONINSIGHTS_CONNECTION_STRING') | default('', true) }}
-      SECUREFLOW_DEFAULT_PASSWORD={{ lookup('env', 'SECUREFLOW_DEFAULT_PASSWORD') | default('', true) }}
+      SPRING_DATASOURCE_USERNAME={{ backend_key_vault_secrets.sql_admin_login }}
+      SPRING_DATASOURCE_PASSWORD={{ backend_key_vault_secrets.sql_admin_password }}
+      APPLICATIONINSIGHTS_CONNECTION_STRING={{ backend_key_vault_secrets.applicationinsights_connection_string }}
+      SECUREFLOW_DEFAULT_PASSWORD={{ backend_key_vault_secrets.secureflow_default_password }}
   no_log: true
   when: app_component == "backend"
 

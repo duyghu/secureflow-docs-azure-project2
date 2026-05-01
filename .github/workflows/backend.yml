@@ -5,10 +5,12 @@ on:
     branches: ["main"]
     paths:
       - "apps/backend/**"
+      - "config/ansible/**"
       - ".github/workflows/backend.yml"
   pull_request:
     paths:
       - "apps/backend/**"
+      - "config/ansible/**"
 
 jobs:
   build-test-scan-package:
@@ -63,12 +65,9 @@ jobs:
       - name: Deploy backend from self-hosted ops runner
         env:
           OPS_SSH_KEY: ${{ secrets.OPS_SSH_KEY }}
-          SQL_SERVER_FQDN: ${{ secrets.SQL_SERVER_FQDN }}
+          KEY_VAULT_URI: ${{ vars.KEY_VAULT_URI || 'https://kv-sfdocs-29c28e.vault.azure.net/' }}
+          SQL_SERVER_FQDN: ${{ vars.SQL_SERVER_FQDN || 'sql-secureflow-dev.database.windows.net' }}
           SQL_DATABASE_NAME: ${{ secrets.SQL_DATABASE_NAME || 'sqldb-secureflow-docs' }}
-          SQL_ADMIN_LOGIN: ${{ secrets.SQL_ADMIN_LOGIN || 'secureflowadmin' }}
-          SQL_ADMIN_PASSWORD: ${{ secrets.SQL_ADMIN_PASSWORD }}
-          APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
-          SECUREFLOW_DEFAULT_PASSWORD: ${{ secrets.SECUREFLOW_DEFAULT_PASSWORD }}
         run: |
           install -m 700 -d ~/.ssh
           printf '%s\n' "$OPS_SSH_KEY" > ~/.ssh/group1-final_key.pem
@@ -77,11 +76,8 @@ jobs:
           sudo apt-get install -y ansible python3-pip
           ansible-galaxy collection install -r config/ansible/requirements.yml
           ANSIBLE_HOST_KEY_CHECKING=False \
+            KEY_VAULT_URI="$KEY_VAULT_URI" \
             SQL_SERVER_FQDN="$SQL_SERVER_FQDN" \
             SQL_DATABASE_NAME="$SQL_DATABASE_NAME" \
-            SQL_ADMIN_LOGIN="$SQL_ADMIN_LOGIN" \
-            SQL_ADMIN_PASSWORD="$SQL_ADMIN_PASSWORD" \
-            APPLICATIONINSIGHTS_CONNECTION_STRING="$APPLICATIONINSIGHTS_CONNECTION_STRING" \
-            SECUREFLOW_DEFAULT_PASSWORD="$SECUREFLOW_DEFAULT_PASSWORD" \
             BACKEND_ARTIFACT="$GITHUB_WORKSPACE/apps/backend/target/secureflow-docs-backend-0.1.0.jar" \
             ansible-playbook config/ansible/site.yml --limit backend -i config/ansible/inventories/prod/hosts.ini --private-key ~/.ssh/group1-final_key.pem
