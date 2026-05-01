@@ -17,6 +17,18 @@ resource "azurerm_mssql_database" "main" {
   max_size_gb    = 10
   zone_redundant = false
   tags           = var.tags
+
+  short_term_retention_policy {
+    retention_days           = 14
+    backup_interval_in_hours = 12
+  }
+
+  long_term_retention_policy {
+    weekly_retention  = "P4W"
+    monthly_retention = "P3M"
+    yearly_retention  = "P1Y"
+    week_of_year      = 1
+  }
 }
 
 resource "azurerm_private_endpoint" "sql" {

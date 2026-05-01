@@ -77,3 +77,11 @@ module "monitoring" {
   sql_database_id       = module.database.sql_database_id
   tags                  = local.tags
 }
+
+module "resilience" {
+  source              = "./modules/resilience"
+  name_prefix         = local.name_prefix
+  location            = data.azurerm_resource_group.main.location
+  resource_group_name = data.azurerm_resource_group.main.name
+  tags                = local.tags
+}

@@ -44,6 +44,7 @@ scripts/validate-gateway.sh   End-to-end App Gateway validation script
 - Application Insights, Log Analytics, diagnostic settings, and metric alerts are included.
 - Cost Management controls include a `$20` monthly resource-group budget, budget alerts, anomaly alerting, and a saved daily cost view.
 - Compliance Mode adds CIS-style Azure Policy checks, Security Center recommendation review, and a `93%` audit posture dashboard.
+- Backup and DR controls include Azure Backup vault/policy, SQL PITR/LTR, and a `95%` recovery readiness dashboard.
 
 ## Prerequisites
 
@@ -141,6 +142,7 @@ Acceptance proof checklist:
 - At least three alerts exist: App Gateway backend health, VM CPU, SQL DTU.
 - Cost monitoring exists: monthly budget alert, forecasted overspend alert, anomaly alert, and Cost Management view.
 - Compliance Mode exists: CIS benchmark controls, Azure Policy assignment, Security Center recommendations, and `93%` posture shown in the UI.
+- Backup and DR exists: Recovery Services Vault, VM backup policy, SQL PITR retention, SQL LTR policy, and recovery drill runbook.
 
 Verified deployment on April 30, 2026:
 
@@ -164,6 +166,9 @@ Place evidence images in `docs/screenshots/`:
 - `compliance-mode-ui.png`
 - `azure-policy-compliance.png`
 - `security-center-recommendations.png`
+- `dr-readiness-ui.png`
+- `recovery-services-vault.png`
+- `sql-pitr-restore.png`
 
 ## Short Demo
 
@@ -175,4 +180,5 @@ Place evidence images in `docs/screenshots/`:
 6. Show Application Insights, Log Analytics, and alerts.
 7. Show Azure Cost Management budget/anomaly controls from [docs/cost-monitoring-dashboard.md](docs/cost-monitoring-dashboard.md).
 8. Show Compliance Mode from [docs/compliance-mode.md](docs/compliance-mode.md).
-9. Show GitHub Actions workflows for Terraform and app deploy.
+9. Show Backup and DR from [docs/backup-disaster-recovery.md](docs/backup-disaster-recovery.md).
+10. Show GitHub Actions workflows for Terraform and app deploy.

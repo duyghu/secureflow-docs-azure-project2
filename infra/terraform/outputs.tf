@@ -42,3 +42,19 @@ output "cis_policy_initiative_name" {
 output "compliance_mode_score" {
   value = module.monitoring.compliance_mode_score
 }
+
+output "recovery_services_vault_name" {
+  value = module.resilience.recovery_services_vault_name
+}
+
+output "vm_backup_policy_name" {
+  value = module.resilience.vm_backup_policy_name
+}
+
+output "sql_pitr_retention_days" {
+  value = module.resilience.sql_pitr_retention_days
+}
+
+output "dr_readiness_score" {
+  value = module.resilience.dr_readiness_score
+}

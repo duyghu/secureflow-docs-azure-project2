@@ -280,6 +280,10 @@ resource "azurerm_monitor_metric_alert" "app_gateway_unhealthy" {
   action {
     action_group_id = azurerm_monitor_action_group.platform.id
   }
+
+  lifecycle {
+    ignore_changes = [action]
+  }
 }
 
 resource "azurerm_monitor_metric_alert" "frontend_cpu" {
@@ -302,6 +306,10 @@ resource "azurerm_monitor_metric_alert" "frontend_cpu" {
 
   action {
     action_group_id = azurerm_monitor_action_group.platform.id
+  }
+
+  lifecycle {
+    ignore_changes = [action]
   }
 }
 
@@ -326,6 +334,10 @@ resource "azurerm_monitor_metric_alert" "backend_cpu" {
   action {
     action_group_id = azurerm_monitor_action_group.platform.id
   }
+
+  lifecycle {
+    ignore_changes = [action]
+  }
 }
 
 resource "azurerm_monitor_metric_alert" "sql_dtu" {
@@ -348,6 +360,10 @@ resource "azurerm_monitor_metric_alert" "sql_dtu" {
 
   action {
     action_group_id = azurerm_monitor_action_group.platform.id
+  }
+
+  lifecycle {
+    ignore_changes = [action]
   }
 }
 

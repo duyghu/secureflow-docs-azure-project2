@@ -103,6 +103,7 @@ requests
 - Show Application Insights, Log Analytics, and the three metric alerts.
 - Show Cost Management budget/anomaly controls and the saved cost view from `docs/cost-monitoring-dashboard.md`.
 - Show Compliance Mode at `93%` with CIS-style Azure Policy checks and Security Center recommendations from `docs/compliance-mode.md`.
+- Show Backup and DR at `95%` with Azure Backup, SQL PITR, and the restore drill from `docs/backup-disaster-recovery.md`.
 - Show GitHub Actions workflows for infrastructure and independent app deploys.
 
 ## Verified Result
@@ -134,3 +135,15 @@ Terraform creates:
 - Compliance Mode UI score: `93% Compliant`.
 
 Use [compliance-mode.md](compliance-mode.md) for the Azure Policy, CIS benchmark, and Security Center demo steps.
+
+## Backup and Disaster Recovery
+
+Terraform creates:
+
+- `rsv-secureflow-dev-dr`: Recovery Services Vault with soft delete and geo-redundant storage.
+- `bkpol-secureflow-dev-vm-daily`: daily VM backup policy.
+- SQL short-term retention for `14` day point-in-time restore.
+- SQL long-term retention for weekly, monthly, and yearly recovery evidence.
+- DR Readiness UI score: `95%`.
+
+Use [backup-disaster-recovery.md](backup-disaster-recovery.md) for the Recovery Services Vault, SQL PITR, and deleted-record restore demo steps.

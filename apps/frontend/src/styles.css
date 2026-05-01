@@ -222,6 +222,11 @@ h1 {
   color: #16372f;
 }
 
+.metric--resilience {
+  background: #fff6db;
+  color: #3d3213;
+}
+
 .capabilities {
   display: grid;
   gap: 1rem;
@@ -251,7 +256,8 @@ h1 {
   line-height: 1.5;
 }
 
-.compliance-mode {
+.compliance-mode,
+.resilience-mode {
   background: #ffffff;
   border-bottom: 1px solid #dbe3dc;
   border-top: 1px solid #dbe3dc;
@@ -261,13 +267,21 @@ h1 {
   padding: 3rem clamp(1rem, 5vw, 4rem);
 }
 
+.resilience-mode {
+  background: #f8faf7;
+  border-top: 0;
+}
+
 .compliance-score,
-.compliance-checks article {
+.compliance-checks article,
+.resilience-score,
+.resilience-checks article {
   border: 1px solid #dbe3dc;
   border-radius: 8px;
 }
 
-.compliance-score {
+.compliance-score,
+.resilience-score {
   background: #102d29;
   color: #ffffff;
   display: grid;
@@ -275,37 +289,48 @@ h1 {
   padding: 1.4rem;
 }
 
+.resilience-score {
+  background: #273425;
+}
+
 .compliance-score > div,
-.compliance-checks article > div {
+.compliance-checks article > div,
+.resilience-score > div,
+.resilience-checks article > div {
   align-items: center;
   display: flex;
   gap: 0.7rem;
 }
 
-.compliance-score > div {
+.compliance-score > div,
+.resilience-score > div {
   color: #d8ebdf;
   font-weight: 800;
 }
 
-.compliance-score strong {
+.compliance-score strong,
+.resilience-score strong {
   color: #f2ce6b;
   font-size: clamp(4rem, 10vw, 7rem);
   line-height: 0.9;
 }
 
-.compliance-score p:last-child {
+.compliance-score p:last-child,
+.resilience-score p:last-child {
   color: #d8e6e2;
   line-height: 1.6;
   margin-bottom: 0;
 }
 
-.compliance-checks {
+.compliance-checks,
+.resilience-checks {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(3, minmax(180px, 1fr));
 }
 
-.compliance-checks article {
+.compliance-checks article,
+.resilience-checks article {
   background: #f8faf7;
   display: grid;
   gap: 0.9rem;
@@ -313,21 +338,29 @@ h1 {
   padding: 1.1rem;
 }
 
-.compliance-checks h2 {
+.resilience-checks article {
+  background: #ffffff;
+}
+
+.compliance-checks h2,
+.resilience-checks h2 {
   font-size: 1rem;
   margin: 0;
 }
 
-.compliance-checks svg {
+.compliance-checks svg,
+.resilience-checks svg {
   color: #0f4c45;
 }
 
-.compliance-checks strong {
+.compliance-checks strong,
+.resilience-checks strong {
   color: #0f4c45;
   font-size: 2.4rem;
 }
 
-.compliance-checks p {
+.compliance-checks p,
+.resilience-checks p {
   color: #52615d;
   line-height: 1.5;
   margin-bottom: 0;
@@ -423,7 +456,9 @@ h1 {
   .hero,
   .capabilities,
   .compliance-mode,
-  .compliance-checks {
+  .compliance-checks,
+  .resilience-mode,
+  .resilience-checks {
     grid-template-columns: 1fr;
   }
 

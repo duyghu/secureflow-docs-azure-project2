@@ -3,11 +3,13 @@ import {
   BadgeCheck,
   BrainCircuit,
   ClipboardCheck,
+  DatabaseBackup,
   FileSignature,
   FileText,
   LockKeyhole,
   LogOut,
   Radar,
+  RotateCcw,
   Send,
   Search,
   ShieldCheck,
@@ -46,6 +48,24 @@ const complianceChecks = [
     label: "Security Center",
     value: "91%",
     detail: "Defender for Cloud recommendation review tracks infrastructure hardening, patch posture, and monitoring coverage."
+  }
+];
+
+const recoveryChecks = [
+  {
+    label: "Azure Backup",
+    value: "Vault ready",
+    detail: "Recovery Services Vault with geo-redundant storage and daily VM backup policy for compute recovery."
+  },
+  {
+    label: "SQL PITR",
+    value: "14 days",
+    detail: "Azure SQL short-term retention supports point-in-time restore for accidental data changes."
+  },
+  {
+    label: "Restore Drill",
+    value: "Documented",
+    detail: "Runbook includes a delete-and-restore demonstration using a restored SQL database copy."
   }
 ];
 
@@ -204,6 +224,10 @@ export function App() {
             <strong>93%</strong>
             <span>Compliance Mode</span>
           </div>
+          <div className="metric metric--resilience">
+            <strong>95%</strong>
+            <span>DR Readiness</span>
+          </div>
         </div>
       </section>
 
@@ -235,6 +259,33 @@ export function App() {
             <article key={check.label}>
               <div>
                 <Radar size={20} aria-hidden="true" />
+                <h2>{check.label}</h2>
+              </div>
+              <strong>{check.value}</strong>
+              <p>{check.detail}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="resilience-mode" aria-label="Backup and disaster recovery">
+        <div className="resilience-score">
+          <p className="eyebrow">Backup and disaster recovery</p>
+          <div>
+            <DatabaseBackup size={30} aria-hidden="true" />
+            <span>Recovery Ready</span>
+          </div>
+          <strong>95%</strong>
+          <p>
+            SecureFlow combines Azure Backup policy coverage, SQL point-in-time restore,
+            and a rehearsed recovery procedure for accidental deletion or regional service disruption.
+          </p>
+        </div>
+        <div className="resilience-checks">
+          {recoveryChecks.map((check) => (
+            <article key={check.label}>
+              <div>
+                <RotateCcw size={20} aria-hidden="true" />
                 <h2>{check.label}</h2>
               </div>
               <strong>{check.value}</strong>
