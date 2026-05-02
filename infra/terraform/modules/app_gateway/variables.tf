@@ -10,4 +10,9 @@ variable "ssl_certificate_password" {
   type      = string
   sensitive = true
 }
+variable "threat_intel_block_ips" {
+  type        = list(string)
+  description = "Threat intelligence IP addresses or CIDR ranges blocked at the Application Gateway WAF policy."
+  default     = []
+}
 variable "tags" { type = map(string) }

@@ -85,3 +85,18 @@ variable "appgw_ssl_certificate_password" {
   description = "Password for the Application Gateway PFX certificate."
   sensitive   = true
 }
+
+variable "threat_intel_block_ips" {
+  type        = list(string)
+  description = "Threat intelligence IP addresses or CIDR ranges blocked by the Application Gateway WAF policy."
+  default = [
+    "162.243.103.246",
+    "178.62.3.223",
+    "27.133.154.218",
+    "34.204.119.63",
+    "50.16.16.211",
+    "1.10.16.0/20",
+    "1.19.0.0/16",
+    "1.32.128.0/18"
+  ]
+}

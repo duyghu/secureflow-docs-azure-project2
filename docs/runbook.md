@@ -105,6 +105,7 @@ requests
 - Show Compliance Mode at `93%` with CIS-style Azure Policy checks and Security Center recommendations from `docs/compliance-mode.md`.
 - Show Backup and DR with Azure Backup, SQL PITR, and the restore drill from `docs/backup-disaster-recovery.md`.
 - Show AI Security Summary with WAF/API anomaly detection and failed-login burst analysis from `docs/ai-powered-log-analysis.md`.
+- Show threat-intelligence WAF blocking with the `BlockThreatIntelIPs` custom rule and refresh workflow from `docs/threat-intelligence-feed.md`.
 - Show Key Vault secret storage and VMSS SSH access through the ops VM from `docs/key-vault-and-vmss-access.md`.
 - Show the self-hosted GitHub runner `secureflow-ops-runner` on the ops VM and the Terraform-managed Azure Bastion Developer host.
 - Show GitHub Actions workflows for infrastructure and independent app deploys.
@@ -160,6 +161,16 @@ Terraform creates:
 - AI Security Summary evidence from Log Analytics alert logic.
 
 Use [ai-powered-log-analysis.md](ai-powered-log-analysis.md) for Kusto queries, alert validation, and the security operations demo script.
+
+## Threat Intelligence Feed Integration
+
+Implemented evidence:
+
+- `waf-secureflow-dev`: Application Gateway WAF policy.
+- `BlockThreatIntelIPs`: WAF custom rule that blocks RemoteAddr matches from the threat feed.
+- `Threat Intelligence WAF Refresh`: scheduled/manual GitHub Actions workflow that fetches EmergingThreats indicators and refreshes the WAF rule.
+
+Use [threat-intelligence-feed.md](threat-intelligence-feed.md) for Azure Portal screenshots, CLI validation, and the SOC automation demo script.
 
 ## Key Vault and VMSS Access
 

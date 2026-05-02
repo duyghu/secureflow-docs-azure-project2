@@ -47,6 +47,7 @@ module "app_gateway" {
   app_gateway_subnet_id    = module.network.app_gateway_subnet_id
   ssl_certificate_base64   = var.appgw_ssl_certificate_base64
   ssl_certificate_password = var.appgw_ssl_certificate_password
+  threat_intel_block_ips   = var.threat_intel_block_ips
   tags                     = local.tags
 }
 

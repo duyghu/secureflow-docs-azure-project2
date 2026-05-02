@@ -45,6 +45,7 @@ docs/                         Architecture diagram and runbook
 - Compliance Mode adds CIS-style Azure Policy checks, Security Center recommendation review, and a `93%` audit posture dashboard.
 - Backup and DR controls include Azure Backup vault/policy, SQL PITR/LTR, and Azure Portal recovery evidence.
 - AI-powered log analysis detects WAF/API traffic spikes and failed-login bursts, then presents an `AI Security Summary`.
+- Threat intelligence integration blocks known hostile IPs at the Application Gateway WAF with a feed-refresh GitHub Actions workflow.
 - Key Vault stores operational secrets behind a private endpoint with RBAC access for VMSS managed identities; the backend VMSS fetches runtime secrets with managed identity during deployment.
 - A self-hosted GitHub Actions runner runs on the ops VM, and Azure Bastion Developer is managed by Terraform for private administrative access.
 
@@ -154,6 +155,7 @@ Acceptance proof checklist:
 - Compliance Mode exists: CIS benchmark controls, Azure Policy assignment, Security Center recommendations, and `93%` posture documented as Azure governance evidence.
 - Backup and DR exists: Recovery Services Vault, VM backup policy, SQL PITR retention, SQL LTR policy, and recovery drill runbook.
 - AI log analysis exists: Log Analytics Kusto rules, scheduled query alerts, and AI Security Summary evidence in Azure monitoring docs.
+- Threat intelligence feed integration exists: WAF custom rule, EmergingThreats indicators, and scheduled GitHub Actions refresh workflow.
 - Key Vault exists: private endpoint, private DNS, secret inventory, managed-identity runtime secret fetch, and documented VMSS SSH jump-host access.
 
 ## Azure Dashboard Snapshot
@@ -267,6 +269,7 @@ Place evidence images in `docs/screenshots/`:
 7. Show Azure Cost Management budget/anomaly controls from [docs/cost-monitoring-dashboard.md](docs/cost-monitoring-dashboard.md).
 8. Show Compliance Mode from [docs/compliance-mode.md](docs/compliance-mode.md).
 9. Show Backup and DR from [docs/backup-disaster-recovery.md](docs/backup-disaster-recovery.md).
-10. Show AI-powered log analysis from [docs/ai-powered-log-analysis.md](docs/ai-powered-log-analysis.md).
-11. Show Key Vault and private VMSS access from [docs/key-vault-and-vmss-access.md](docs/key-vault-and-vmss-access.md).
-12. Show GitHub Actions workflows for Terraform and app deploy.
+10. Show threat-intelligence WAF blocking from [docs/threat-intelligence-feed.md](docs/threat-intelligence-feed.md).
+11. Show AI-powered log analysis from [docs/ai-powered-log-analysis.md](docs/ai-powered-log-analysis.md).
+12. Show Key Vault and private VMSS access from [docs/key-vault-and-vmss-access.md](docs/key-vault-and-vmss-access.md).
+13. Show GitHub Actions workflows for Terraform and app deploy.

@@ -14,6 +14,27 @@ resource "azurerm_web_application_firewall_policy" "main" {
   resource_group_name = var.resource_group_name
   tags                = var.tags
 
+  dynamic "custom_rules" {
+    for_each = length(var.threat_intel_block_ips) > 0 ? [1] : []
+
+    content {
+      name      = "BlockThreatIntelIPs"
+      priority  = 50
+      rule_type = "MatchRule"
+      action    = "Block"
+
+      match_conditions {
+        match_variables {
+          variable_name = "RemoteAddr"
+        }
+
+        operator           = "IPMatch"
+        negation_condition = false
+        match_values       = var.threat_intel_block_ips
+      }
+    }
+  }
+
   policy_settings {
     enabled                     = true
     mode                        = "Prevention"

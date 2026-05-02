@@ -86,3 +86,11 @@ output "key_vault_uri" {
 output "key_vault_private_endpoint_name" {
   value = module.key_vault.key_vault_private_endpoint_name
 }
+
+output "threat_intel_waf_rule_name" {
+  value = "BlockThreatIntelIPs"
+}
+
+output "threat_intel_blocked_ip_count" {
+  value = length(var.threat_intel_block_ips)
+}
