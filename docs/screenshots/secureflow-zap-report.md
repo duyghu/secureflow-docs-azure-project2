@@ -8,8 +8,8 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 | Risk Level | Number of Alerts |
 | --- | --- |
 | High | 0 |
-| Medium | 1 |
-| Low | 7 |
+| Medium | 2 |
+| Low | 4 |
 | Informational | 2 |
 
 
@@ -32,14 +32,12 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 
 | Name | Risk Level | Number of Instances |
 | --- | --- | --- |
+| CSP: style-src unsafe-inline | Medium | 1 |
 | Content Security Policy (CSP) Header Not Set | Medium | 3 |
 | Cross-Origin-Embedder-Policy Header Missing or Invalid | Low | 1 |
-| Cross-Origin-Opener-Policy Header Missing or Invalid | Low | 1 |
-| Cross-Origin-Resource-Policy Header Missing or Invalid | Low | 1 |
 | Permissions Policy Header Not Set | Low | 3 |
-| Server Leaks Version Information via "Server" HTTP Response Header Field | Low | 4 |
+| Server Leaks Version Information via "Server" HTTP Response Header Field | Low | 3 |
 | Strict-Transport-Security Header Not Set | Low | 3 |
-| X-Content-Type-Options Header Missing | Low | 1 |
 | Modern Web Application | Informational | 1 |
 | Non-Storable Content | Informational | 4 |
 
@@ -49,6 +47,48 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 ## Alert Detail
 
 
+
+### [ CSP: style-src unsafe-inline ](https://www.zaproxy.org/docs/alerts/10055/)
+
+
+
+##### Medium (High)
+
+### Description
+
+Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks. Including (but not limited to) Cross Site Scripting (XSS), and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.
+
+* URL: https://135.116.238.100/
+  * Node Name: `https://135.116.238.100/`
+  * Method: `GET`
+  * Parameter: `Content-Security-Policy`
+  * Attack: ``
+  * Evidence: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://dc.services.visualstudio.com https://*.in.applicationinsights.azure.com https://*.applicationinsights.azure.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`
+  * Other Info: `style-src includes unsafe-inline.`
+
+
+Instances: 1
+
+### Solution
+
+Ensure that your web server, application server, load balancer, etc. is properly configured to set the Content-Security-Policy header.
+
+### Reference
+
+
+* [ https://www.w3.org/TR/CSP/ ](https://www.w3.org/TR/CSP/)
+* [ https://caniuse.com/#search=content+security+policy ](https://caniuse.com/#search=content+security+policy)
+* [ https://content-security-policy.com/ ](https://content-security-policy.com/)
+* [ https://github.com/HtmlUnit/htmlunit-csp ](https://github.com/HtmlUnit/htmlunit-csp)
+* [ https://web.dev/articles/csp#resource-options ](https://web.dev/articles/csp#resource-options)
+
+
+#### CWE Id: [ 693 ](https://cwe.mitre.org/data/definitions/693.html)
+
+
+#### WASC Id: 15
+
+#### Source ID: 3
 
 ### [ Content Security Policy (CSP) Header Not Set ](https://www.zaproxy.org/docs/alerts/10038/)
 
@@ -147,87 +187,6 @@ If possible, ensure that the end user uses a standards-compliant and modern web 
 
 #### Source ID: 3
 
-### [ Cross-Origin-Opener-Policy Header Missing or Invalid ](https://www.zaproxy.org/docs/alerts/90004/)
-
-
-
-##### Low (Medium)
-
-### Description
-
-Cross-Origin-Opener-Policy header is a response header that allows a site to control if others included documents share the same browsing context. Sharing the same browsing context with untrusted documents might lead to data leak.
-
-* URL: https://135.116.238.100/
-  * Node Name: `https://135.116.238.100/`
-  * Method: `GET`
-  * Parameter: `Cross-Origin-Opener-Policy`
-  * Attack: ``
-  * Evidence: ``
-  * Other Info: ``
-
-
-Instances: 1
-
-### Solution
-
-Ensure that the application/web server sets the Cross-Origin-Opener-Policy header appropriately, and that it sets the Cross-Origin-Opener-Policy header to 'same-origin' for documents.
-'same-origin-allow-popups' is considered as less secured and should be avoided.
-If possible, ensure that the end user uses a standards-compliant and modern web browser that supports the Cross-Origin-Opener-Policy header (https://caniuse.com/mdn-http_headers_cross-origin-opener-policy).
-
-### Reference
-
-
-* [ https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cross-Origin-Opener-Policy ](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cross-Origin-Opener-Policy)
-
-
-#### CWE Id: [ 693 ](https://cwe.mitre.org/data/definitions/693.html)
-
-
-#### WASC Id: 14
-
-#### Source ID: 3
-
-### [ Cross-Origin-Resource-Policy Header Missing or Invalid ](https://www.zaproxy.org/docs/alerts/90004/)
-
-
-
-##### Low (Medium)
-
-### Description
-
-Cross-Origin-Resource-Policy header is an opt-in header designed to counter side-channels attacks like Spectre. Resource should be specifically set as shareable amongst different origins.
-
-* URL: https://135.116.238.100/
-  * Node Name: `https://135.116.238.100/`
-  * Method: `GET`
-  * Parameter: `Cross-Origin-Resource-Policy`
-  * Attack: ``
-  * Evidence: ``
-  * Other Info: ``
-
-
-Instances: 1
-
-### Solution
-
-Ensure that the application/web server sets the Cross-Origin-Resource-Policy header appropriately, and that it sets the Cross-Origin-Resource-Policy header to 'same-origin' for all web pages.
-'same-site' is considered as less secured and should be avoided.
-If resources must be shared, set the header to 'cross-origin'.
-If possible, ensure that the end user uses a standards-compliant and modern web browser that supports the Cross-Origin-Resource-Policy header (https://caniuse.com/mdn-http_headers_cross-origin-resource-policy).
-
-### Reference
-
-
-* [ https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cross-Origin-Embedder-Policy ](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cross-Origin-Embedder-Policy)
-
-
-#### CWE Id: [ 693 ](https://cwe.mitre.org/data/definitions/693.html)
-
-
-#### WASC Id: 14
-
-#### Source ID: 3
-
 ### [ Permissions Policy Header Not Set ](https://www.zaproxy.org/docs/alerts/10063/)
 
 
@@ -301,13 +260,6 @@ The web/application server is leaking version information via the "Server" HTTP 
   * Attack: ``
   * Evidence: `Microsoft-Azure-Application-Gateway/v2`
   * Other Info: ``
-* URL: https://135.116.238.100/
-  * Node Name: `https://135.116.238.100/`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `nginx/1.18.0 (Ubuntu)`
-  * Other Info: ``
 * URL: https://135.116.238.100/robots.txt
   * Node Name: `https://135.116.238.100/robots.txt`
   * Method: `GET`
@@ -324,7 +276,7 @@ The web/application server is leaking version information via the "Server" HTTP 
   * Other Info: ``
 
 
-Instances: 4
+Instances: 3
 
 ### Solution
 
@@ -395,47 +347,6 @@ Ensure that your web server, application server, load balancer, etc. is configur
 
 
 #### CWE Id: [ 319 ](https://cwe.mitre.org/data/definitions/319.html)
-
-
-#### WASC Id: 15
-
-#### Source ID: 3
-
-### [ X-Content-Type-Options Header Missing ](https://www.zaproxy.org/docs/alerts/10021/)
-
-
-
-##### Low (Medium)
-
-### Description
-
-The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.
-
-* URL: https://135.116.238.100/
-  * Node Name: `https://135.116.238.100/`
-  * Method: `GET`
-  * Parameter: `x-content-type-options`
-  * Attack: ``
-  * Evidence: ``
-  * Other Info: `This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.
-At "High" threshold this scan rule will not alert on client or server error responses.`
-
-
-Instances: 1
-
-### Solution
-
-Ensure that the application/web server sets the Content-Type header appropriately, and that it sets the X-Content-Type-Options header to 'nosniff' for all web pages.
-If possible, ensure that the end user uses a standards-compliant and modern web browser that does not perform MIME-sniffing at all, or that can be directed by the web application/web server to not perform MIME-sniffing.
-
-### Reference
-
-
-* [ https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/compatibility/gg622941(v=vs.85) ](https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/compatibility/gg622941(v=vs.85))
-* [ https://owasp.org/www-community/Security_Headers ](https://owasp.org/www-community/Security_Headers)
-
-
-#### CWE Id: [ 693 ](https://cwe.mitre.org/data/definitions/693.html)
 
 
 #### WASC Id: 15
