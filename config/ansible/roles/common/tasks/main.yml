@@ -3,6 +3,7 @@
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 3600
+    force_apt_get: true  
 
 - name: Install baseline packages
   ansible.builtin.apt:
@@ -13,6 +14,7 @@
       - nginx
       - openjdk-21-jre-headless
     state: present
+    force_apt_get: true
 
 - name: Ensure unattended security upgrades are installed
   ansible.builtin.apt:
@@ -24,3 +26,7 @@
     name: unattended-upgrades
     enabled: true
     state: started
+
+- name: Wait for any unattended-upgrades to finish
+  ansible.builtin.shell: while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 5; done;
+  changed_when: false
