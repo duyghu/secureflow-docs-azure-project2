@@ -106,6 +106,7 @@ requests
 - Show Backup and DR with Azure Backup, SQL PITR, and the restore drill from `docs/backup-disaster-recovery.md`.
 - Show AI Security Summary with WAF/API anomaly detection and failed-login burst analysis from `docs/ai-powered-log-analysis.md`.
 - Show threat-intelligence WAF blocking with the `BlockThreatIntelIPs` custom rule and refresh workflow from `docs/threat-intelligence-feed.md`.
+- Show DAST with the OWASP ZAP GitHub Actions workflow and uploaded scan report from `docs/dast-security-testing.md`.
 - Show Key Vault secret storage and VMSS SSH access through the ops VM from `docs/key-vault-and-vmss-access.md`.
 - Show the self-hosted GitHub runner `secureflow-ops-runner` on the ops VM and the Terraform-managed Azure Bastion Developer host.
 - Show GitHub Actions workflows for infrastructure and independent app deploys.
@@ -171,6 +172,17 @@ Implemented evidence:
 - `Threat Intelligence WAF Refresh`: scheduled/manual GitHub Actions workflow that fetches EmergingThreats indicators and refreshes the WAF rule.
 
 Use [threat-intelligence-feed.md](threat-intelligence-feed.md) for Azure Portal screenshots, CLI validation, and the SOC automation demo script.
+
+## Dynamic Application Security Testing
+
+Implemented evidence:
+
+- `DAST`: GitHub Actions workflow.
+- `secureflow-ops`: self-hosted runner on the Azure ops VM in `group1_final`.
+- `secureflow-zap-dast-report`: uploaded OWASP ZAP report artifact.
+- Target: Application Gateway URL, with private frontend/backend/SQL tiers remaining unreachable directly.
+
+Use [dast-security-testing.md](dast-security-testing.md) for workflow screenshots, report validation, and the security testing demo script.
 
 ## Key Vault and VMSS Access
 
