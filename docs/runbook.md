@@ -108,6 +108,7 @@ requests
 - Show threat-intelligence WAF blocking with the `BlockThreatIntelIPs` custom rule and refresh workflow from `docs/threat-intelligence-feed.md`.
 - Show DAST with the OWASP ZAP GitHub Actions workflow and uploaded scan report from `docs/dast-security-testing.md`.
 - Show layered load balancing with private frontend/backend internal load balancers from `docs/load-balancing.md`.
+- Show WAF Layer 7 flood protection with the `RateLimitLayer7Flood` custom rule from `docs/layer-7-flood-protection.md`.
 - Show Key Vault secret storage and VMSS SSH access through the ops VM from `docs/key-vault-and-vmss-access.md`.
 - Show the self-hosted GitHub runner `secureflow-ops-runner` on the ops VM and the Terraform-managed Azure Bastion Developer host.
 - Show GitHub Actions workflows for infrastructure and independent app deploys.
@@ -195,6 +196,16 @@ Implemented evidence:
 - VMSS backend pools and health probes for frontend `/health` and backend `/api/health`.
 
 Use [load-balancing.md](load-balancing.md) for Azure Portal screenshots, CLI validation, and the scalability demo script.
+
+## Layer 7 Flood Protection
+
+Implemented evidence:
+
+- `waf-secureflow-dev`: Application Gateway WAF policy in prevention mode.
+- `RateLimitLayer7Flood`: WAF rate-limit custom rule for client request bursts.
+- `BlockThreatIntelIPs`: WAF custom rule for known malicious IP indicators.
+
+Use [layer-7-flood-protection.md](layer-7-flood-protection.md) for Azure Portal screenshots, safe burst testing, and Log Analytics validation.
 
 ## Key Vault and VMSS Access
 

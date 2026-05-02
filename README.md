@@ -48,6 +48,7 @@ docs/                         Architecture diagram and runbook
 - Threat intelligence integration blocks known hostile IPs at the Application Gateway WAF with a feed-refresh GitHub Actions workflow.
 - Dynamic Application Security Testing runs OWASP ZAP against the live Application Gateway URL from the Azure self-hosted runner.
 - Load balancing uses Application Gateway WAF for public ingress plus private internal Azure Load Balancers for frontend and backend VMSS tiers.
+- Layer 7 flood protection uses an Application Gateway WAF rate-limit rule to block excessive client request bursts.
 - Key Vault stores operational secrets behind a private endpoint with RBAC access for VMSS managed identities; the backend VMSS fetches runtime secrets with managed identity during deployment.
 - A self-hosted GitHub Actions runner runs on the ops VM, and Azure Bastion Developer is managed by Terraform for private administrative access.
 
@@ -160,6 +161,7 @@ Acceptance proof checklist:
 - Threat intelligence feed integration exists: WAF custom rule, EmergingThreats indicators, and scheduled GitHub Actions refresh workflow.
 - DAST exists: OWASP ZAP GitHub Actions workflow, reports artifact, and Azure self-hosted runner execution evidence.
 - Load balancing exists: frontend/backend internal load balancers, private backend pools, health probes, and VMSS pool targets.
+- Layer 7 flood protection exists: WAF rate-limit rule `RateLimitLayer7Flood` blocks excessive request bursts.
 - Key Vault exists: private endpoint, private DNS, secret inventory, managed-identity runtime secret fetch, and documented VMSS SSH jump-host access.
 
 ## Azure Dashboard Snapshot
@@ -276,6 +278,7 @@ Place evidence images in `docs/screenshots/`:
 10. Show threat-intelligence WAF blocking from [docs/threat-intelligence-feed.md](docs/threat-intelligence-feed.md).
 11. Show DAST evidence from [docs/dast-security-testing.md](docs/dast-security-testing.md).
 12. Show load balancing from [docs/load-balancing.md](docs/load-balancing.md).
-13. Show AI-powered log analysis from [docs/ai-powered-log-analysis.md](docs/ai-powered-log-analysis.md).
-14. Show Key Vault and private VMSS access from [docs/key-vault-and-vmss-access.md](docs/key-vault-and-vmss-access.md).
-15. Show GitHub Actions workflows for Terraform and app deploy.
+13. Show Layer 7 flood protection from [docs/layer-7-flood-protection.md](docs/layer-7-flood-protection.md).
+14. Show AI-powered log analysis from [docs/ai-powered-log-analysis.md](docs/ai-powered-log-analysis.md).
+15. Show Key Vault and private VMSS access from [docs/key-vault-and-vmss-access.md](docs/key-vault-and-vmss-access.md).
+16. Show GitHub Actions workflows for Terraform and app deploy.

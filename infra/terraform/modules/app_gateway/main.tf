@@ -35,6 +35,26 @@ resource "azurerm_web_application_firewall_policy" "main" {
     }
   }
 
+  custom_rules {
+    name                 = "RateLimitLayer7Flood"
+    priority             = 60
+    rule_type            = "RateLimitRule"
+    action               = "Block"
+    rate_limit_duration  = "OneMin"
+    rate_limit_threshold = 120
+    group_rate_limit_by  = "ClientAddr"
+
+    match_conditions {
+      match_variables {
+        variable_name = "RequestUri"
+      }
+
+      operator           = "Regex"
+      negation_condition = false
+      match_values       = [".*"]
+    }
+  }
+
   policy_settings {
     enabled                     = true
     mode                        = "Prevention"
