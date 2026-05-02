@@ -28,24 +28,30 @@ public class DemoDataInitializer implements CommandLineRunner {
 
   private void migrateLegacyDemoRecords() {
     List<DocumentRecord> changed = new ArrayList<>();
+
     for (DocumentRecord document : repository.findAll()) {
       boolean updated = false;
+
       if (LEGACY_DEMO_EMAIL.equalsIgnoreCase(document.getOwner())) {
         document.setOwner(DEMO_EMAIL);
         updated = true;
       }
+
       if (LEGACY_DEMO_EMAIL.equalsIgnoreCase(document.getOwnerUsername())) {
         document.setOwnerUsername(DEMO_EMAIL);
         updated = true;
       }
+
       if (LEGACY_DEMO_EMAIL.equalsIgnoreCase(document.getSignerEmail())) {
         document.setSignerEmail(DEMO_EMAIL);
         updated = true;
       }
+
       if (updated) {
         changed.add(document);
       }
     }
+
     if (!changed.isEmpty()) {
       repository.saveAll(changed);
     }
@@ -57,7 +63,7 @@ public class DemoDataInitializer implements CommandLineRunner {
     }
 
     repository.saveAll(List.of(
-        demoRecord(
+        demoRecord(new DemoRecordData(
             "Vendor Data Processing Addendum",
             "Contract",
             "Signature requested",
@@ -67,8 +73,8 @@ public class DemoDataInitializer implements CommandLineRunner {
             "Due today",
             "vendor-dpa.pdf",
             482304L,
-            "Legal prepared this envelope for controlled signature with evidence capture."),
-        demoRecord(
+            "Legal prepared this envelope for controlled signature with evidence capture.")),
+        demoRecord(new DemoRecordData(
             "Regional Procurement Approval",
             "Invoice",
             "Signature requested",
@@ -78,8 +84,8 @@ public class DemoDataInitializer implements CommandLineRunner {
             "Due this week",
             "procurement-approval.pdf",
             140992L,
-            "Finance review packet sent with spend owner and signer metadata."),
-        demoRecord(
+            "Finance review packet sent with spend owner and signer metadata.")),
+        demoRecord(new DemoRecordData(
             "Employee Policy Attestation",
             "Policy",
             "Completed",
@@ -89,34 +95,34 @@ public class DemoDataInitializer implements CommandLineRunner {
             "Completed",
             "policy-attestation.pdf",
             90112L,
-            "Policy acknowledgement completed and retained for audit.")));
+            "Policy acknowledgement completed and retained for audit."))));
   }
 
-  private DocumentRecord demoRecord(
+  private DocumentRecord demoRecord(DemoRecordData data) {
+    DocumentRecord document = new DocumentRecord();
+
+    document.setTitle(data.title());
+    document.setCategory(data.category());
+    document.setStatus(data.status());
+    document.setOwner(data.ownerUsername());
+    document.setOwnerUsername(data.ownerUsername());
+    document.setSignerEmail(data.signerEmail());
+    document.setSignatureStatus(data.signatureStatus());
+    document.setSignatureDeadline(data.signatureDeadline());
+    document.setOriginalFileName(data.originalFileName());
+    document.setContentType("application/pdf");
+    document.setFileSize(data.fileSize());
+    document.setExtractedSummary(data.extractedSummary());
+    document.setCreatedAt(Instant.now());
+
+    return document;
+  }
+
+  private record DemoRecordData(
       String title,
       String category,
       String status,
       String ownerUsername,
       String signerEmail,
       String signatureStatus,
-      String signatureDeadline,
-      String originalFileName,
-      Long fileSize,
-      String extractedSummary) {
-    DocumentRecord document = new DocumentRecord();
-    document.setTitle(title);
-    document.setCategory(category);
-    document.setStatus(status);
-    document.setOwner(ownerUsername);
-    document.setOwnerUsername(ownerUsername);
-    document.setSignerEmail(signerEmail);
-    document.setSignatureStatus(signatureStatus);
-    document.setSignatureDeadline(signatureDeadline);
-    document.setOriginalFileName(originalFileName);
-    document.setContentType("application/pdf");
-    document.setFileSize(fileSize);
-    document.setExtractedSummary(extractedSummary);
-    document.setCreatedAt(Instant.now());
-    return document;
-  }
-}
+      String
