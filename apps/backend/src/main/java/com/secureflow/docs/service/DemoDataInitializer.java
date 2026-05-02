@@ -125,4 +125,9 @@ public class DemoDataInitializer implements CommandLineRunner {
       String ownerUsername,
       String signerEmail,
       String signatureStatus,
-      String
+      String signatureDeadline,
+      String originalFileName,
+      Long fileSize,
+      String extractedSummary) {
+  }
+}
