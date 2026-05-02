@@ -15,6 +15,22 @@ output "backend_vmss_name" {
   value = module.compute.backend_vmss_name
 }
 
+output "frontend_internal_load_balancer_name" {
+  value = module.load_balancer.frontend_lb_name
+}
+
+output "backend_internal_load_balancer_name" {
+  value = module.load_balancer.backend_lb_name
+}
+
+output "frontend_internal_load_balancer_private_ip" {
+  value = module.load_balancer.frontend_lb_private_ip
+}
+
+output "backend_internal_load_balancer_private_ip" {
+  value = module.load_balancer.backend_lb_private_ip
+}
+
 output "bastion_host_name" {
   value = module.bastion.bastion_host_name
 }

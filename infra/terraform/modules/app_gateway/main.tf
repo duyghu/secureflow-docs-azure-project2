@@ -95,11 +95,13 @@ resource "azurerm_application_gateway" "main" {
   }
 
   backend_address_pool {
-    name = "frontend-pool"
+    name         = "frontend-pool"
+    ip_addresses = [var.frontend_load_balancer_private_ip]
   }
 
   backend_address_pool {
-    name = "backend-pool"
+    name         = "backend-pool"
+    ip_addresses = [var.backend_load_balancer_private_ip]
   }
 
   backend_http_settings {

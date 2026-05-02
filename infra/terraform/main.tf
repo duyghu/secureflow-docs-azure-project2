@@ -39,30 +39,44 @@ module "database" {
   tags                = local.tags
 }
 
+module "load_balancer" {
+  source              = "./modules/load_balancer"
+  name_prefix         = local.name_prefix
+  location            = data.azurerm_resource_group.main.location
+  resource_group_name = data.azurerm_resource_group.main.name
+  web_subnet_id       = module.network.web_subnet_id
+  api_subnet_id       = module.network.api_subnet_id
+  frontend_private_ip = var.frontend_load_balancer_private_ip
+  backend_private_ip  = var.backend_load_balancer_private_ip
+  tags                = local.tags
+}
+
 module "app_gateway" {
-  source                   = "./modules/app_gateway"
-  name_prefix              = local.name_prefix
-  location                 = data.azurerm_resource_group.main.location
-  resource_group_name      = data.azurerm_resource_group.main.name
-  app_gateway_subnet_id    = module.network.app_gateway_subnet_id
-  ssl_certificate_base64   = var.appgw_ssl_certificate_base64
-  ssl_certificate_password = var.appgw_ssl_certificate_password
-  threat_intel_block_ips   = var.threat_intel_block_ips
-  tags                     = local.tags
+  source                            = "./modules/app_gateway"
+  name_prefix                       = local.name_prefix
+  location                          = data.azurerm_resource_group.main.location
+  resource_group_name               = data.azurerm_resource_group.main.name
+  app_gateway_subnet_id             = module.network.app_gateway_subnet_id
+  frontend_load_balancer_private_ip = module.load_balancer.frontend_lb_private_ip
+  backend_load_balancer_private_ip  = module.load_balancer.backend_lb_private_ip
+  ssl_certificate_base64            = var.appgw_ssl_certificate_base64
+  ssl_certificate_password          = var.appgw_ssl_certificate_password
+  threat_intel_block_ips            = var.threat_intel_block_ips
+  tags                              = local.tags
 }
 
 module "compute" {
-  source                   = "./modules/compute"
-  name_prefix              = local.name_prefix
-  location                 = data.azurerm_resource_group.main.location
-  resource_group_name      = data.azurerm_resource_group.main.name
-  frontend_subnet_id       = module.network.web_subnet_id
-  backend_subnet_id        = module.network.api_subnet_id
-  frontend_backend_pool_id = module.app_gateway.frontend_backend_pool_id
-  api_backend_pool_id      = module.app_gateway.api_backend_pool_id
-  admin_username           = var.admin_username
-  ssh_public_key           = var.ssh_public_key
-  tags                     = local.tags
+  source                      = "./modules/compute"
+  name_prefix                 = local.name_prefix
+  location                    = data.azurerm_resource_group.main.location
+  resource_group_name         = data.azurerm_resource_group.main.name
+  frontend_subnet_id          = module.network.web_subnet_id
+  backend_subnet_id           = module.network.api_subnet_id
+  frontend_lb_backend_pool_id = module.load_balancer.frontend_backend_pool_id
+  backend_lb_backend_pool_id  = module.load_balancer.backend_backend_pool_id
+  admin_username              = var.admin_username
+  ssh_public_key              = var.ssh_public_key
+  tags                        = local.tags
 }
 
 module "bastion" {

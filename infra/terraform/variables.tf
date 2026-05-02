@@ -74,6 +74,18 @@ variable "budget_start_date" {
   default     = "2026-05-01T00:00:00Z"
 }
 
+variable "frontend_load_balancer_private_ip" {
+  type        = string
+  description = "Static private IP for the frontend internal load balancer."
+  default     = "10.2.2.10"
+}
+
+variable "backend_load_balancer_private_ip" {
+  type        = string
+  description = "Static private IP for the backend internal load balancer."
+  default     = "10.2.3.10"
+}
+
 variable "appgw_ssl_certificate_base64" {
   type        = string
   description = "Base64-encoded PFX certificate for HTTPS listener."

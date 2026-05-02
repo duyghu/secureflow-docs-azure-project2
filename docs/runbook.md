@@ -107,6 +107,7 @@ requests
 - Show AI Security Summary with WAF/API anomaly detection and failed-login burst analysis from `docs/ai-powered-log-analysis.md`.
 - Show threat-intelligence WAF blocking with the `BlockThreatIntelIPs` custom rule and refresh workflow from `docs/threat-intelligence-feed.md`.
 - Show DAST with the OWASP ZAP GitHub Actions workflow and uploaded scan report from `docs/dast-security-testing.md`.
+- Show layered load balancing with private frontend/backend internal load balancers from `docs/load-balancing.md`.
 - Show Key Vault secret storage and VMSS SSH access through the ops VM from `docs/key-vault-and-vmss-access.md`.
 - Show the self-hosted GitHub runner `secureflow-ops-runner` on the ops VM and the Terraform-managed Azure Bastion Developer host.
 - Show GitHub Actions workflows for infrastructure and independent app deploys.
@@ -183,6 +184,17 @@ Implemented evidence:
 - Target: Application Gateway URL, with private frontend/backend/SQL tiers remaining unreachable directly.
 
 Use [dast-security-testing.md](dast-security-testing.md) for workflow screenshots, report validation, and the security testing demo script.
+
+## Load Balancing
+
+Implemented evidence:
+
+- `agw-secureflow-dev`: public Application Gateway WAF v2 load balancer.
+- `ilb-secureflow-dev-frontend`: private frontend internal load balancer.
+- `ilb-secureflow-dev-backend`: private backend internal load balancer.
+- VMSS backend pools and health probes for frontend `/health` and backend `/api/health`.
+
+Use [load-balancing.md](load-balancing.md) for Azure Portal screenshots, CLI validation, and the scalability demo script.
 
 ## Key Vault and VMSS Access
 

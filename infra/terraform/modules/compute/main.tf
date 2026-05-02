@@ -36,10 +36,10 @@ resource "azurerm_linux_virtual_machine_scale_set" "frontend" {
     primary = true
 
     ip_configuration {
-      name                                         = "ipconfig"
-      primary                                      = true
-      subnet_id                                    = var.frontend_subnet_id
-      application_gateway_backend_address_pool_ids = [var.frontend_backend_pool_id]
+      name                                   = "ipconfig"
+      primary                                = true
+      subnet_id                              = var.frontend_subnet_id
+      load_balancer_backend_address_pool_ids = [var.frontend_lb_backend_pool_id]
     }
   }
 
@@ -82,10 +82,10 @@ resource "azurerm_linux_virtual_machine_scale_set" "backend" {
     primary = true
 
     ip_configuration {
-      name                                         = "ipconfig"
-      primary                                      = true
-      subnet_id                                    = var.backend_subnet_id
-      application_gateway_backend_address_pool_ids = [var.api_backend_pool_id]
+      name                                   = "ipconfig"
+      primary                                = true
+      subnet_id                              = var.backend_subnet_id
+      load_balancer_backend_address_pool_ids = [var.backend_lb_backend_pool_id]
     }
   }
 
