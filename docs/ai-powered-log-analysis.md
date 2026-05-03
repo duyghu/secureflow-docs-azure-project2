@@ -20,17 +20,11 @@ This implementation uses deterministic anomaly rules that are easy to explain in
 
 The detector groups Application Gateway logs by source IP and request URI. It flags concentrated traffic against `/api/*` paths when one source produces more than `100` requests in a `5` minute bucket.
 
-Presentation phrasing:
-
-> Traffic pattern resembles Layer 7 DoS behavior targeting `/api/*` endpoints.
 
 ### Failed Login Burst
 
 The detector groups Application Insights request logs for `/api/auth/login` failures. It flags more than `5` failed attempts from the same client signal within a `5` minute bucket.
 
-Presentation phrasing:
-
-> Repeated failed authentication pattern resembles credential stuffing or brute-force activity.
 
 ## Kusto Queries
 
@@ -63,18 +57,7 @@ FailedLoginRequests
 | where FailedAttempts > 5
 ```
 
-## Azure Portal Demo Steps
 
-1. Open Azure Portal.
-2. Go to Log Analytics workspaces.
-3. Open `law-secureflow-dev`.
-4. Run the WAF/API spike query.
-5. Run the failed login burst query.
-6. Go to Monitor > Alerts.
-7. Show `alert-secureflow-dev-ai-api-traffic-spike`.
-8. Show `alert-secureflow-dev-ai-failed-login-burst`.
-9. Open the SecureFlow web app.
-10. Show the `AI Security Summary` evidence from this runbook and the Azure Monitor alert rules.
 
 ## CLI Validation
 
@@ -91,11 +74,3 @@ az monitor log-analytics query \
   --analytics-query "AzureDiagnostics | where TimeGenerated > ago(30m) | summarize Count=count() by Category" \
   -o table
 ```
-
-## Demo Talk Track
-
-- "This is not just monitoring; it is security signal interpretation."
-- "Application Gateway and WAF logs flow into Log Analytics."
-- "Kusto rules detect API traffic concentration and failed-login bursts."
-- "The runbook summarizes those detections as an AI Security Summary for executives."
-- "A future enhancement can send the same query output to Azure OpenAI or OpenAI API to generate incident narratives automatically."
