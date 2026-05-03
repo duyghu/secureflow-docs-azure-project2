@@ -84,7 +84,7 @@ module "bastion" {
   name                = "${var.vnet_name}-bastion"
   location            = data.azurerm_resource_group.main.location
   resource_group_name = data.azurerm_resource_group.main.name
-  virtual_network_id  = data.azurerm_virtual_network.main.id
+  vnet_name           = data.azurerm_virtual_network.main.name
   tags                = local.tags
 }
 
