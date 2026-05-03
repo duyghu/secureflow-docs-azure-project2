@@ -69,8 +69,14 @@ resource "azurerm_policy_definition" "audit_public_nics" {
           equals = "Microsoft.Network/networkInterfaces"
         },
         {
-          field  = "Microsoft.Network/networkInterfaces/ipconfigurations[*].publicIpAddress.id"
-          exists = true
+          count = {
+            field = "Microsoft.Network/networkInterfaces/ipconfigurations[*]"
+            where = {
+              field  = "Microsoft.Network/networkInterfaces/ipconfigurations[*].publicIpAddress.id"
+              exists = true
+            }
+          }
+          greater = 0
         }
       ]
     }
