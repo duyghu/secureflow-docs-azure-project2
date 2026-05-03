@@ -21,6 +21,10 @@ class DemoDataInitializerTests {
   private static final String DEMO_EMAIL = "automission@company.com";
   private static final String LEGACY_EMAIL = "duyghu@company.com";
 
+  // ADD THESE
+  private static final String SIGNATURE_REQUESTED = "Signature requested";
+  private static final String READY_FOR_MY_SIGNATURE = "Ready for my signature";
+
   private final DocumentRepository repository = mock(DocumentRepository.class);
   private final DemoDataInitializer initializer = new DemoDataInitializer(repository);
 
@@ -62,19 +66,23 @@ class DemoDataInitializerTests {
             "Vendor Data Processing Addendum",
             "Regional Procurement Approval",
             "Employee Policy Attestation");
+
     assertThat(seededRecords).allSatisfy(document -> {
       assertThat(document.getContentType()).isEqualTo("application/pdf");
       assertThat(document.getCreatedAt()).isNotNull();
-      assertThat(List.of(document.getOwnerUsername(), document.getSignerEmail())).contains(DEMO_EMAIL);
+      assertThat(List.of(document.getOwnerUsername(), document.getSignerEmail()))
+          .contains(DEMO_EMAIL);
     });
+
     verify(repository).save(org.mockito.ArgumentMatchers.argThat(document ->
         "Board Resolution Signature Packet".equals(document.getTitle())
             && DEMO_EMAIL.equals(document.getSignerEmail())
-            && "Ready for my signature".equals(document.getSignatureStatus())));
+            && READY_FOR_MY_SIGNATURE.equals(document.getSignatureStatus())));
+
     verify(repository).save(org.mockito.ArgumentMatchers.argThat(document ->
         "Vendor Risk Exception Approval".equals(document.getTitle())
             && DEMO_EMAIL.equals(document.getSignerEmail())
-            && "Ready for my signature".equals(document.getSignatureStatus())));
+            && READY_FOR_MY_SIGNATURE.equals(document.getSignatureStatus())));
   }
 
   @Test
@@ -90,20 +98,25 @@ class DemoDataInitializerTests {
         "Board Resolution Signature Packet".equals(document.getTitle())
             && "corporate.secretary@company.com".equals(document.getOwnerUsername())
             && DEMO_EMAIL.equals(document.getSignerEmail())));
+
     verify(repository).save(org.mockito.ArgumentMatchers.argThat(document ->
         "Vendor Risk Exception Approval".equals(document.getTitle())
             && "vendor.risk@company.com".equals(document.getOwnerUsername())
             && DEMO_EMAIL.equals(document.getSignerEmail())));
+
     verify(repository, times(2)).findAll();
-    verify(repository, times(2)).findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(anyString(), anyString());
+    verify(repository, times(2))
+        .findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(anyString(), anyString());
   }
 
   @Test
   void runDoesNotDuplicateSignatureInboxRecordsWhenTheyAlreadyExist() {
     DocumentRecord boardResolution = documentOwnedBy(DEMO_EMAIL);
     boardResolution.setTitle("Board Resolution Signature Packet");
+
     DocumentRecord vendorRisk = documentOwnedBy(DEMO_EMAIL);
     vendorRisk.setTitle("Vendor Risk Exception Approval");
+
     when(repository.findAll()).thenReturn(List.of(boardResolution, vendorRisk));
     when(repository.findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(DEMO_EMAIL, DEMO_EMAIL))
         .thenReturn(List.of(boardResolution, vendorRisk));
@@ -111,9 +124,12 @@ class DemoDataInitializerTests {
     initializer.run();
 
     verify(repository, times(2)).findAll();
-    verify(repository, times(2)).findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(anyString(), anyString());
+    verify(repository, times(2))
+        .findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(anyString(), anyString());
+
     verify(repository, never()).save(any(DocumentRecord.class));
-    verify(repository, never()).saveAll(org.mockito.ArgumentMatchers.<Iterable<DocumentRecord>>any());
+    verify(repository, never())
+        .saveAll(org.mockito.ArgumentMatchers.<Iterable<DocumentRecord>>any());
   }
 
   @Test
@@ -122,25 +138,36 @@ class DemoDataInitializerTests {
     activeInboxRecord.setTitle("Board Resolution Signature Packet");
     activeInboxRecord.setOwnerUsername("corporate.secretary@company.com");
     activeInboxRecord.setSignerEmail(DEMO_EMAIL);
+
     DocumentRecord retiredSentRecord = sentDocument("Backend.txt");
     DocumentRecord retainedSentRecord = sentDocument("automission.docx");
 
-    when(repository.findAll()).thenReturn(List.of(activeInboxRecord, retiredSentRecord, retainedSentRecord));
-    when(repository.findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(DEMO_EMAIL, DEMO_EMAIL))
+    when(repository.findAll()).thenReturn(
+        List.of(activeInboxRecord, retiredSentRecord, retainedSentRecord));
+
+    when(repository.findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(
+        DEMO_EMAIL, DEMO_EMAIL))
         .thenReturn(List.of(activeInboxRecord, retiredSentRecord, retainedSentRecord));
 
     initializer.run();
 
-    ArgumentCaptor<Iterable<DocumentRecord>> deletedRecords = documentRecordIterableCaptor();
+    ArgumentCaptor<Iterable<DocumentRecord>> deletedRecords =
+        documentRecordIterableCaptor();
+
     verify(repository).deleteAll(deletedRecords.capture());
-    assertThat(iterableToList(deletedRecords.getValue())).containsExactly(retiredSentRecord);
+
+    assertThat(iterableToList(deletedRecords.getValue()))
+        .containsExactly(retiredSentRecord);
   }
 
   private static DocumentRecord documentOwnedBy(String email) {
     DocumentRecord document = new DocumentRecord();
     document.setTitle("Board Approval");
     document.setCategory("Contract");
-    document.setStatus("Signature requested");
+
+    // FIXED
+    document.setStatus(SIGNATURE_REQUESTED);
+
     document.setOwner(email);
     document.setOwnerUsername(email);
     document.setSignerEmail(email);
@@ -157,14 +184,18 @@ class DemoDataInitializerTests {
   }
 
   @SuppressWarnings("unchecked")
-  private static ArgumentCaptor<Iterable<DocumentRecord>> documentRecordIterableCaptor() {
+  private static ArgumentCaptor<Iterable<DocumentRecord>>
+      documentRecordIterableCaptor() {
     return ArgumentCaptor.forClass(Iterable.class);
   }
 
-  private static List<DocumentRecord> iterableToList(Iterable<DocumentRecord> records) {
+  private static List<DocumentRecord> iterableToList(
+      Iterable<DocumentRecord> records) {
+
     if (records instanceof Collection<DocumentRecord> collection) {
       return List.copyOf(collection);
     }
+
     return org.assertj.core.util.Lists.newArrayList(records);
   }
 }
