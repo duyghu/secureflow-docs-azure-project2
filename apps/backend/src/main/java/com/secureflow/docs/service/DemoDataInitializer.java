@@ -24,6 +24,7 @@ public class DemoDataInitializer implements CommandLineRunner {
   public void run(String... args) {
     migrateLegacyDemoRecords();
     seedDemoRecordsWhenEmpty();
+    ensureSignatureInboxDemoRecords();
   }
 
   private void migrateLegacyDemoRecords() {
@@ -58,11 +59,36 @@ public class DemoDataInitializer implements CommandLineRunner {
   }
 
   private void seedDemoRecordsWhenEmpty() {
-    if (!repository.findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(DEMO_EMAIL, DEMO_EMAIL).isEmpty()) {
+    List<DocumentRecord> mailboxRecords = repository.findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(DEMO_EMAIL, DEMO_EMAIL);
+    if (!mailboxRecords.isEmpty()) {
       return;
     }
 
-    repository.saveAll(List.of(
+    repository.saveAll(defaultDemoRecords());
+  }
+
+  private void ensureSignatureInboxDemoRecords() {
+    List<DocumentRecord> mailboxRecords = repository.findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(DEMO_EMAIL, DEMO_EMAIL);
+    boolean boardResolutionExists = mailboxRecords.stream()
+        .anyMatch(document -> "Board Resolution Signature Packet".equalsIgnoreCase(document.getTitle()));
+
+    if (!boardResolutionExists) {
+      repository.save(demoRecord(new DemoRecordData(
+          "Board Resolution Signature Packet",
+          "Governance",
+          "Signature requested",
+          "corporate.secretary@company.com",
+          DEMO_EMAIL,
+          "Ready for my signature",
+          "Due tomorrow",
+          "board-resolution-signature-packet.pdf",
+          218736L,
+          "Corporate secretary prepared a board resolution envelope requiring executive approval.")));
+    }
+  }
+
+  private List<DocumentRecord> defaultDemoRecords() {
+    return List.of(
         demoRecord(new DemoRecordData(
             "Vendor Data Processing Addendum",
             "Contract",
@@ -95,7 +121,7 @@ public class DemoDataInitializer implements CommandLineRunner {
             "Completed",
             "policy-attestation.pdf",
             90112L,
-            "Policy acknowledgement completed and retained for audit."))));
+            "Policy acknowledgement completed and retained for audit.")));
   }
 
   private DocumentRecord demoRecord(DemoRecordData data) {

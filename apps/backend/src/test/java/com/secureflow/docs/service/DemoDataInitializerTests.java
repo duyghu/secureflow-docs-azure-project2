@@ -1,9 +1,11 @@
 package com.secureflow.docs.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -65,10 +67,14 @@ class DemoDataInitializerTests {
       assertThat(document.getCreatedAt()).isNotNull();
       assertThat(List.of(document.getOwnerUsername(), document.getSignerEmail())).contains(DEMO_EMAIL);
     });
+    verify(repository).save(org.mockito.ArgumentMatchers.argThat(document ->
+        "Board Resolution Signature Packet".equals(document.getTitle())
+            && DEMO_EMAIL.equals(document.getSignerEmail())
+            && "Ready for my signature".equals(document.getSignatureStatus())));
   }
 
   @Test
-  void runLeavesExistingDemoMailboxRecordsUntouched() {
+  void runAddsMissingBoardResolutionToExistingDemoMailbox() {
     DocumentRecord existingDocument = documentOwnedBy(DEMO_EMAIL);
     when(repository.findAll()).thenReturn(List.of(existingDocument));
     when(repository.findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(DEMO_EMAIL, DEMO_EMAIL))
@@ -76,8 +82,28 @@ class DemoDataInitializerTests {
 
     initializer.run();
 
+    verify(repository).save(org.mockito.ArgumentMatchers.argThat(document ->
+        "Board Resolution Signature Packet".equals(document.getTitle())
+            && "corporate.secretary@company.com".equals(document.getOwnerUsername())
+            && DEMO_EMAIL.equals(document.getSignerEmail())));
+    verify(repository).findAll();
+    verify(repository, times(2)).findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(anyString(), anyString());
+  }
+
+  @Test
+  void runDoesNotDuplicateBoardResolutionWhenItAlreadyExists() {
+    DocumentRecord existingDocument = documentOwnedBy(DEMO_EMAIL);
+    existingDocument.setTitle("Board Resolution Signature Packet");
+    when(repository.findAll()).thenReturn(List.of(existingDocument));
+    when(repository.findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(DEMO_EMAIL, DEMO_EMAIL))
+        .thenReturn(List.of(existingDocument));
+
+    initializer.run();
+
+    verify(repository).findAll();
+    verify(repository, times(2)).findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(anyString(), anyString());
+    verify(repository, never()).save(any(DocumentRecord.class));
     verify(repository, never()).saveAll(org.mockito.ArgumentMatchers.<Iterable<DocumentRecord>>any());
-    verify(repository).findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(anyString(), anyString());
   }
 
   private static DocumentRecord documentOwnedBy(String email) {
