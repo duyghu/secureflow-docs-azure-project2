@@ -26,19 +26,6 @@ Internet
 
 Application Gateway still remains the only public entry. The internal load balancers do not have public IP addresses.
 
-## Azure Portal Demo Steps
-
-1. Open Azure Portal.
-2. Go to Resource groups.
-3. Select `group1_final`.
-4. Search `ilb-secureflow-dev`.
-5. Open `ilb-secureflow-dev-frontend`.
-6. Show private frontend IP `10.2.2.10`, backend pool, health probe, and load balancing rule.
-7. Open `ilb-secureflow-dev-backend`.
-8. Show private backend IP `10.2.3.10`, backend pool, health probe, and load balancing rule.
-9. Open Application Gateway `agw-secureflow-dev`.
-10. Show backend pools point to the private ILB IP targets.
-11. Show VMSS autoscale settings for frontend/backend to explain how the load balancers distribute traffic when scale-out happens.
 
 ## CLI Validation
 
@@ -63,10 +50,3 @@ az network application-gateway show-backend-health \
   --name agw-secureflow-dev \
   -o table
 ```
-
-## Demo Talk Track
-
-- "Application Gateway is the only internet-facing load balancer and WAF."
-- "Behind it, we added private Azure Load Balancers for the frontend and backend VMSS tiers."
-- "The ILBs distribute traffic across VMSS instances as autoscale adds capacity."
-- "This keeps public exposure clean while giving the compute tiers production-style horizontal scaling."
