@@ -22,17 +22,6 @@ SecureFlow Docs includes a small FinOps control set so the project is not only d
 
 This mirrors production FinOps practice: teams should detect overspend before the bill arrives, investigate unexpected usage changes, and keep infrastructure demos inside a predictable budget.
 
-## Azure Portal Demo Steps
-
-1. Open Azure Portal.
-2. Go to Resource groups.
-3. Select `group1_final`.
-4. Open Cost Management.
-5. Open Budgets and show `budget-secureflow-dev-monthly`.
-6. Show alert thresholds: 50% actual, 80% actual, 100% forecasted.
-7. Open Cost analysis and select the saved view `SecureFlow Docs daily resource cost`.
-8. Change grouping to Resource type if needed and show App Gateway, VMSS, SQL, storage, and monitoring spend.
-9. Go to Cost alerts and show active budget/anomaly alert configuration.
 
 ## CLI Validation
 
@@ -60,11 +49,3 @@ az rest \
   --method get \
   --url "https://management.azure.com/subscriptions/<subscription-id>/providers/Microsoft.CostManagement/scheduledActions/cost-anomaly-sf-dev?api-version=2025-03-01"
 ```
-
-## Demo Talk Track
-
-- "The app is protected by WAF and private networking, but production also needs cost controls."
-- "Terraform creates a `$20` monthly resource-group budget."
-- "Actual cost alerts fire at 50% and 80%; forecasted cost alerts fire if Azure predicts the project will exceed `$20`."
-- "Cost anomaly detection catches unusual daily spend patterns, which is useful when a VM size, scale rule, or gateway setting accidentally increases cost."
-- "The saved Cost Management view gives a dashboard-style breakdown of month-to-date cost by resource type."
