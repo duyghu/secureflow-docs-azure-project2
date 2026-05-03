@@ -22,26 +22,6 @@ The scan runs from the project Azure environment and validates the only public e
 
 SAST and SonarQube inspect source code, but DAST tests the live deployed app. This helps prove that HTTPS, headers, cookies, routing, and exposed endpoints behave safely after deployment.
 
-## GitHub Actions Demo Steps
-
-1. Open GitHub repository.
-2. Go to Actions.
-3. Select workflow `DAST`.
-4. Run workflow manually, or open the latest scheduled/manual run.
-5. Show it runs on labels `self-hosted`, `Linux`, `X64`, `secureflow-ops`.
-6. Open the uploaded artifact `secureflow-zap-dast-report`.
-7. Screenshot the workflow success page and the HTML report summary.
-
-## Azure Demo Steps
-
-1. Open Azure Portal.
-2. Go to Resource groups.
-3. Select `group1_final`.
-4. Open the ops VM `group1-final`.
-5. Show it hosts the self-hosted GitHub runner.
-6. Open Application Gateway `agw-secureflow-dev`.
-7. Show the public frontend and `/api/health` are exposed only through App Gateway.
-8. Explain that ZAP scans this public gateway URL while frontend/backend/SQL remain private.
 
 ## Local Validation
 
@@ -61,21 +41,3 @@ sudo docker run --rm \
     -I \
     -z "-config connection.sslAcceptAll=true"
 ```
-
-## Latest Validation Result
-
-The latest manual scan from the Azure ops VM completed with:
-
-- URLs scanned: `4`
-- Failed checks: `0`
-- Warnings: `8`
-- Passed passive checks: `59`
-
-The warnings are mostly hardening headers such as HSTS, CSP, and Permissions-Policy. They are useful remediation evidence for the security section of the presentation.
-
-## Demo Talk Track
-
-- "SonarQube gives static security analysis, but DAST tests the deployed system from the outside."
-- "The scan runs from our Azure self-hosted runner against the Application Gateway URL."
-- "This validates the public attack surface while keeping VMSS and SQL private."
-- "The ZAP report becomes evidence for live application security testing in our CI/CD pipeline."
