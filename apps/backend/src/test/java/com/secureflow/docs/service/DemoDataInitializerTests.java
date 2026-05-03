@@ -71,10 +71,14 @@ class DemoDataInitializerTests {
         "Board Resolution Signature Packet".equals(document.getTitle())
             && DEMO_EMAIL.equals(document.getSignerEmail())
             && "Ready for my signature".equals(document.getSignatureStatus())));
+    verify(repository).save(org.mockito.ArgumentMatchers.argThat(document ->
+        "Vendor Risk Exception Approval".equals(document.getTitle())
+            && DEMO_EMAIL.equals(document.getSignerEmail())
+            && "Ready for my signature".equals(document.getSignatureStatus())));
   }
 
   @Test
-  void runAddsMissingBoardResolutionToExistingDemoMailbox() {
+  void runAddsMissingSignatureInboxRecordsToExistingDemoMailbox() {
     DocumentRecord existingDocument = documentOwnedBy(DEMO_EMAIL);
     when(repository.findAll()).thenReturn(List.of(existingDocument));
     when(repository.findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(DEMO_EMAIL, DEMO_EMAIL))
@@ -86,24 +90,50 @@ class DemoDataInitializerTests {
         "Board Resolution Signature Packet".equals(document.getTitle())
             && "corporate.secretary@company.com".equals(document.getOwnerUsername())
             && DEMO_EMAIL.equals(document.getSignerEmail())));
-    verify(repository).findAll();
+    verify(repository).save(org.mockito.ArgumentMatchers.argThat(document ->
+        "Vendor Risk Exception Approval".equals(document.getTitle())
+            && "vendor.risk@company.com".equals(document.getOwnerUsername())
+            && DEMO_EMAIL.equals(document.getSignerEmail())));
+    verify(repository, times(2)).findAll();
     verify(repository, times(2)).findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(anyString(), anyString());
   }
 
   @Test
-  void runDoesNotDuplicateBoardResolutionWhenItAlreadyExists() {
-    DocumentRecord existingDocument = documentOwnedBy(DEMO_EMAIL);
-    existingDocument.setTitle("Board Resolution Signature Packet");
-    when(repository.findAll()).thenReturn(List.of(existingDocument));
+  void runDoesNotDuplicateSignatureInboxRecordsWhenTheyAlreadyExist() {
+    DocumentRecord boardResolution = documentOwnedBy(DEMO_EMAIL);
+    boardResolution.setTitle("Board Resolution Signature Packet");
+    DocumentRecord vendorRisk = documentOwnedBy(DEMO_EMAIL);
+    vendorRisk.setTitle("Vendor Risk Exception Approval");
+    when(repository.findAll()).thenReturn(List.of(boardResolution, vendorRisk));
     when(repository.findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(DEMO_EMAIL, DEMO_EMAIL))
-        .thenReturn(List.of(existingDocument));
+        .thenReturn(List.of(boardResolution, vendorRisk));
 
     initializer.run();
 
-    verify(repository).findAll();
+    verify(repository, times(2)).findAll();
     verify(repository, times(2)).findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(anyString(), anyString());
     verify(repository, never()).save(any(DocumentRecord.class));
     verify(repository, never()).saveAll(org.mockito.ArgumentMatchers.<Iterable<DocumentRecord>>any());
+  }
+
+  @Test
+  void runDeletesRetiredSentRecordsForDemoMailbox() {
+    DocumentRecord activeInboxRecord = documentOwnedBy(DEMO_EMAIL);
+    activeInboxRecord.setTitle("Board Resolution Signature Packet");
+    activeInboxRecord.setOwnerUsername("corporate.secretary@company.com");
+    activeInboxRecord.setSignerEmail(DEMO_EMAIL);
+    DocumentRecord retiredSentRecord = sentDocument("Backend.txt");
+    DocumentRecord retainedSentRecord = sentDocument("automission.docx");
+
+    when(repository.findAll()).thenReturn(List.of(activeInboxRecord, retiredSentRecord, retainedSentRecord));
+    when(repository.findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(DEMO_EMAIL, DEMO_EMAIL))
+        .thenReturn(List.of(activeInboxRecord, retiredSentRecord, retainedSentRecord));
+
+    initializer.run();
+
+    ArgumentCaptor<Iterable<DocumentRecord>> deletedRecords = documentRecordIterableCaptor();
+    verify(repository).deleteAll(deletedRecords.capture());
+    assertThat(iterableToList(deletedRecords.getValue())).containsExactly(retiredSentRecord);
   }
 
   private static DocumentRecord documentOwnedBy(String email) {
@@ -115,6 +145,14 @@ class DemoDataInitializerTests {
     document.setOwnerUsername(email);
     document.setSignerEmail(email);
     document.setSignatureStatus("Ready for signature");
+    return document;
+  }
+
+  private static DocumentRecord sentDocument(String title) {
+    DocumentRecord document = documentOwnedBy(DEMO_EMAIL);
+    document.setTitle(title);
+    document.setSignerEmail("legal.approver@company.com");
+    document.setSignatureStatus("Awaiting counterparty signature");
     return document;
   }
 

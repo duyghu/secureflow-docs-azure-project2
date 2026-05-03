@@ -25,6 +25,7 @@ public class DemoDataInitializer implements CommandLineRunner {
     migrateLegacyDemoRecords();
     seedDemoRecordsWhenEmpty();
     ensureSignatureInboxDemoRecords();
+    removeRetiredSentDemoRecords();
   }
 
   private void migrateLegacyDemoRecords() {
@@ -71,6 +72,8 @@ public class DemoDataInitializer implements CommandLineRunner {
     List<DocumentRecord> mailboxRecords = repository.findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(DEMO_EMAIL, DEMO_EMAIL);
     boolean boardResolutionExists = mailboxRecords.stream()
         .anyMatch(document -> "Board Resolution Signature Packet".equalsIgnoreCase(document.getTitle()));
+    boolean vendorRiskExists = mailboxRecords.stream()
+        .anyMatch(document -> "Vendor Risk Exception Approval".equalsIgnoreCase(document.getTitle()));
 
     if (!boardResolutionExists) {
       repository.save(demoRecord(new DemoRecordData(
@@ -84,6 +87,38 @@ public class DemoDataInitializer implements CommandLineRunner {
           "board-resolution-signature-packet.pdf",
           218736L,
           "Corporate secretary prepared a board resolution envelope requiring executive approval.")));
+    }
+
+    if (!vendorRiskExists) {
+      repository.save(demoRecord(new DemoRecordData(
+          "Vendor Risk Exception Approval",
+          "Risk",
+          "Signature requested",
+          "vendor.risk@company.com",
+          DEMO_EMAIL,
+          "Ready for my signature",
+          "Due in 48 hours",
+          "vendor-risk-exception-approval.pdf",
+          176512L,
+          "Risk office routed a vendor exception memo for controlled signature approval.")));
+    }
+  }
+
+  private void removeRetiredSentDemoRecords() {
+    List<String> retiredSentTitles = List.of(
+        "Backend.txt",
+        "group1_final.png",
+        "group1_final.jpg",
+        "secureflow-test-contract.txt");
+
+    List<DocumentRecord> retiredRecords = repository.findAll().stream()
+        .filter(document -> DEMO_EMAIL.equalsIgnoreCase(document.getOwnerUsername()))
+        .filter(document -> !DEMO_EMAIL.equalsIgnoreCase(document.getSignerEmail()))
+        .filter(document -> retiredSentTitles.stream().anyMatch(title -> title.equalsIgnoreCase(document.getTitle())))
+        .toList();
+
+    if (!retiredRecords.isEmpty()) {
+      repository.deleteAll(retiredRecords);
     }
   }
 
