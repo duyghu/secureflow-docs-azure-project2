@@ -48,7 +48,7 @@ GitHub Actions automates this through `.github/workflows/frontend.yml` and `.git
 ## Validate
 
 ```bash
-curl -k https://135.116.238.100/
+curl -k https://e-document.tech/
 ```
 
 Expected proof:
@@ -120,7 +120,7 @@ Terraform creates:
 - `initiative-secureflow-dev-cis-foundation`: custom CIS-style Azure Policy initiative.
 - `pa-secureflow-dev-cis`: resource-group policy assignment for `group1_final`.
 - Audit checks for SQL public network access, compute public NIC exposure, and Application Gateway WAF v2.
-- Compliance Mode UI score: `93% Compliant`.
+- Compliance Mode UI score: `100% Compliant`.
 
 Use [compliance-mode.md](compliance-mode.md) for the Azure Policy, CIS benchmark, and Security Center demo steps.
 
@@ -196,12 +196,3 @@ Terraform creates:
 - Key Vault private endpoint in `snet-data`.
 - Private DNS zone `privatelink.vaultcore.azure.net`.
 - Key Vault secret access for frontend and backend VMSS managed identities.
-
-VMSS SSH access uses the ops VM as a jump host:
-
-```bash
-ssh -i /Users/duyguu16/Desktop/group1-final_key.pem \
-  -o StrictHostKeyChecking=no \
-  -o ProxyCommand='ssh -i /Users/duyguu16/Desktop/group1-final_key.pem -o StrictHostKeyChecking=no -W %h:%p azureuser@4.223.163.109' \
-  azureuser@10.2.2.4
-```
