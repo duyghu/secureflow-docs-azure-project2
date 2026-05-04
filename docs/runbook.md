@@ -205,5 +205,3 @@ ssh -i /Users/duyguu16/Desktop/group1-final_key.pem \
   -o ProxyCommand='ssh -i /Users/duyguu16/Desktop/group1-final_key.pem -o StrictHostKeyChecking=no -W %h:%p azureuser@4.223.163.109' \
   azureuser@10.2.2.4
 ```
-
-Use [key-vault-and-vmss-access.md](key-vault-and-vmss-access.md) for secret names and full SSH commands.
