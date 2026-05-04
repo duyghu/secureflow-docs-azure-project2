@@ -93,25 +93,6 @@ requests
 | summarize failures=countif(success == false), total=count() by bin(timestamp, 5m)
 ```
 
-## Demo Script
-
-- Show `docs/architecture-diagram.svg` and explain one public entry through App Gateway WAF.
-- Open the gateway URL and load the SecureFlow Docs homepage.
-- Click upload demo document or run the validation script to prove API write and read.
-- Show Azure SQL public network access disabled and the private endpoint in `snet-data`.
-- Show VM networking with no public IPs and NSGs allowing only App Gateway subnet ingress.
-- Show Application Insights, Log Analytics, and the three metric alerts.
-- Show Cost Management budget/anomaly controls and the saved cost view from `docs/cost-monitoring-dashboard.md`.
-- Show Compliance Mode at `93%` with CIS-style Azure Policy checks and Security Center recommendations from `docs/compliance-mode.md`.
-- Show Backup and DR with Azure Backup, SQL PITR, and the restore drill from `docs/backup-disaster-recovery.md`.
-- Show AI Security Summary with WAF/API anomaly detection and failed-login burst analysis from `docs/ai-powered-log-analysis.md`.
-- Show threat-intelligence WAF blocking with the `BlockThreatIntelIPs` custom rule and refresh workflow from `docs/threat-intelligence-feed.md`.
-- Show DAST with the OWASP ZAP GitHub Actions workflow and uploaded scan report from `docs/dast-security-testing.md`.
-- Show layered load balancing with private frontend/backend internal load balancers from `docs/load-balancing.md`.
-- Show WAF Layer 7 flood protection with the `RateLimitLayer7Flood` custom rule from `docs/layer-7-flood-protection.md`.
-- Show Key Vault secret storage and VMSS SSH access through the ops VM from `docs/key-vault-and-vmss-access.md`.
-- Show the self-hosted GitHub runner `secureflow-ops-runner` on the ops VM and the Terraform-managed Azure Bastion Developer host.
-- Show GitHub Actions workflows for infrastructure and independent app deploys.
 
 ## Verified Result
 
