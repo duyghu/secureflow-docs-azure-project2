@@ -1,77 +1,447 @@
 # SecureFlow Docs
 
-SecureFlow Docs is a production-style enterprise document management and AI platform scaffold. It demonstrates a private Azure 3-tier architecture with a React + TypeScript + Vite frontend, Java Spring Boot/Maven backend, Azure SQL Database, Terraform infrastructure, Ansible configuration, and GitHub Actions automation.
+SecureFlow Docs is a production-style enterprise document management and AI platform scaffold built on Azure. The project demonstrates a secure, scalable, and highly available private 3-tier Azure architecture using a React + TypeScript + Vite frontend, Java Spring Boot/Maven backend, Azure SQL Database, Terraform infrastructure, Ansible configuration management, and GitHub Actions CI/CD automation.
+
+The platform modernizes a legacy single-VM application by improving scalability, availability, security, automation, monitoring, compliance, backup/recovery, and operational visibility through enterprise-style Azure architecture patterns.
 
 ![SecureFlow Docs architecture](docs/architecture-diagram.svg)
 
-## What The App Does
+---
 
-Companies can upload and manage contracts, invoices, HR documents, policies, and PDFs. The platform is shaped for AI-assisted organization, semantic search, important information extraction, approval tracking, digital signatures, and permission control.
+# What The App Does
 
-Current reference implementation:
+Companies can upload and manage:
+- Contracts
+- HR documents
+- Policies
+- PDFs
+- Invoices
+- Approval workflows
 
-- Frontend dashboard for document status and workflow operations.
-- Backend REST API for creating and reading document records.
-- Local H2 database for development.
-- Azure SQL Database target for production through a private endpoint.
+The platform is designed for:
+- AI-assisted document organization
+- Semantic search
+- Information extraction
+- Digital approval workflows
+- Permission management
+- Secure document operations
 
-## Repository Structure
+## Current Reference Implementation
+
+- React + TypeScript + Vite frontend dashboard
+- Java Spring Boot REST API backend
+- Azure SQL production database
+- Local H2 development database
+- Secure API-based document operations
+- Private Azure networking
+
+---
+
+# Repository Structure
 
 ```text
-infra/terraform/              Azure resources, modules, variables, remote-state ready backend
-config/ansible/               Host inventories and roles for patching, SonarQube, and app deploy
+infra/terraform/              Azure resources, modules, variables, remote-state backend
+config/ansible/               Host inventories and automation roles
 apps/frontend/                React + TypeScript + Vite frontend
-apps/backend/                 Java 21 Spring Boot + Maven REST API
-.github/workflows/            Infrastructure, frontend, and backend automation
-docs/                         Architecture diagram and runbook
+apps/backend/                 Java 21 Spring Boot + Maven backend
+.github/workflows/            Infrastructure and CI/CD automation
+docs/                         Architecture diagrams, screenshots, and runbook
+README.md
 ```
 
-## Azure Architecture
+---
 
-- Existing resource group: `group1_final`.
-- Existing VNet: `group1-final-vnet` (`10.2.0.0/16`).
-- Ops VM: `group1-final` (`10.2.0.4`, public SSH entry used only for Ansible/bootstrap).
-- New private subnets: `snet-appgw`, `snet-web`, `snet-api`, and `snet-data`.
-- Application Gateway WAF v2 is the only public ingress.
-- Public HTTPS URL: `https://135.116.238.100/` (self-signed certificate for project demo).
-- `/` routes to private frontend VMSS `vmss-secureflow-dev-frontend` on port 80.
-- `/api/*` routes to private backend VMSS `vmss-secureflow-dev-backend` on port 8080.
-- VMSS instances use `Standard_D2s_v3` because Sweden Central B-series v2 quota is zero in this subscription.
-- Compute tiers have no public IPs.
+# Azure Architecture
+
+## Core Infrastructure
+
+- Existing resource group: `group1_final`
+- Existing VNet: `group1-final-vnet`
+- Ops VM: `group1-final`
+- Private subnets:
+  - `snet-appgw`
+  - `snet-web`
+  - `snet-api`
+  - `snet-data`
+
+## Traffic Architecture
+
+```text
+Internet
+  -> Application Gateway WAF v2
+  -> Internal Load Balancers
+  -> Frontend / Backend VMSS
+  -> Azure SQL Database through Private Endpoint
+```
+
+## Public Access
+
+- Public HTTPS URL:
+  - `https://e-document.tech/`
+- Application Gateway WAF v2 is the only public ingress point.
+- `/` routes to frontend VMSS.
+- `/api/*` routes to backend VMSS.
+
+## Private Infrastructure
+
+- Frontend and backend VMSS instances have no public IPs.
 - Azure SQL public network access is disabled.
-- SQL access is through Private Endpoint and Private DNS.
-- Application Insights, Log Analytics, diagnostic settings, and metric alerts are included, with backend Java telemetry and frontend browser telemetry wired to the shared connection string.
-- Cost Management controls include a `$20` monthly resource-group budget, budget alerts, anomaly alerting, and a saved daily cost view.
-- Compliance Mode adds CIS-style Azure Policy checks, Security Center recommendation review, and a `93%` audit posture dashboard.
-- Backup and DR controls include Azure Backup vault/policy, SQL PITR/LTR, and Azure Portal recovery evidence.
-- AI-powered log analysis detects WAF/API traffic spikes and failed-login bursts, then presents an `AI Security Summary`.
-- Threat intelligence integration blocks known hostile IPs at the Application Gateway WAF with a feed-refresh GitHub Actions workflow.
-- Dynamic Application Security Testing runs OWASP ZAP against the live Application Gateway URL from the Azure self-hosted runner.
-- Load balancing uses Application Gateway WAF for public ingress plus private internal Azure Load Balancers for frontend and backend VMSS tiers.
-- Layer 7 flood protection uses an Application Gateway WAF rate-limit rule to block excessive client request bursts.
-- Key Vault stores operational secrets behind a private endpoint with RBAC access for VMSS managed identities; the backend VMSS fetches runtime secrets with managed identity during deployment.
-- A self-hosted GitHub Actions runner runs on the ops VM, and Azure Bastion Developer is managed by Terraform for private administrative access.
+- SQL access uses Private Endpoint + Private DNS.
+- Internal Load Balancers remain private.
+- Administrative access uses:
+  - Azure Bastion
+  - Ops VM jump host
+  - Private networking
 
-## Prerequisites
+---
 
-- Azure subscription with permission to create networking, compute, SQL, monitor, and Application Gateway resources.
-- Azure CLI authenticated locally or OIDC secrets configured for GitHub Actions.
-- Terraform `>= 1.6`.
-- Ansible for VM configuration.
-- Node.js 22 for frontend development.
-- Java 21 and Maven for backend development.
-- Budget/quota for Application Gateway WAF v2, Linux VMs, Azure SQL, and monitoring.
+# Scalability & Availability
 
-## Local Development
+The original legacy environment relied on a single VM, creating:
+- single points of failure,
+- limited scalability,
+- availability risks,
+- and performance bottlenecks.
 
-Run the backend:
+SecureFlow Docs introduces horizontal scaling and layered load balancing.
+
+## Implemented Controls
+
+- Frontend VMSS
+- Backend VMSS
+- Internal Azure Load Balancers
+- Application Gateway backend pools
+- Health probes
+- Autoscaling support
+- Independent frontend/backend scaling
+
+## Load Balancing
+
+### Implemented Components
+
+- Public load balancer:
+  - `agw-secureflow-dev`
+- Frontend ILB:
+  - `ilb-secureflow-dev-frontend`
+- Backend ILB:
+  - `ilb-secureflow-dev-backend`
+
+### Health Probes
+
+- Frontend:
+  - `/health`
+- Backend:
+  - `/api/health`
+
+## Benefits
+
+- Eliminates single points of failure
+- Improves application availability
+- Enables horizontal scaling
+- Separates public and private traffic
+- Supports future autoscaling expansion
+
+---
+
+# Security Architecture
+
+Security is the highest project priority.
+
+## Core Security Controls
+
+- Application Gateway WAF v2 in Prevention Mode
+- Private VMSS instances
+- No compute public IPs
+- Azure SQL public access disabled
+- NSG ingress restrictions
+- Private Endpoints
+- Azure Key Vault private access
+- Managed Identity authentication
+- Threat intelligence IP blocking
+- Layer 7 flood protection
+- OWASP ZAP DAST validation
+
+---
+
+# Key Vault & Secret Management
+
+SecureFlow Docs stores operational secrets in a private Azure Key Vault.
+
+## Implemented Controls
+
+- Private Key Vault
+- RBAC authorization
+- Private Endpoint
+- Managed Identity access
+- Purge protection
+- Soft delete enabled
+
+## Stored Secrets
+
+- SQL credentials
+- SSH keys
+- Runtime application secrets
+- Application Gateway certificate secrets
+
+## Managed Identity Runtime Access
+
+Backend VMSS instances retrieve runtime secrets directly from Key Vault through Managed Identity without exposing credentials in GitHub Actions pipelines.
+
+---
+
+# Threat Intelligence Feed Integration
+
+SecureFlow Docs implements SOC-style threat intelligence blocking at the WAF layer.
+
+## Implemented Controls
+
+- WAF policy:
+  - `waf-secureflow-dev`
+- Threat intelligence rule:
+  - `BlockThreatIntelIPs`
+- EmergingThreats feed integration
+- Automated GitHub Actions refresh workflow
+
+## Benefits
+
+- Blocks known malicious IPs
+- Stops threats before reaching private infrastructure
+- Demonstrates lightweight SOC automation
+
+---
+
+# Layer 7 Flood Protection
+
+SecureFlow Docs includes HTTP flood protection through custom WAF rate-limiting rules.
+
+## Implemented Controls
+
+- WAF rate-limit custom rules
+- Client request burst detection
+- Automatic blocking action
+- Threshold:
+  - `120` requests per minute
+
+## Benefits
+
+- Prevents HTTP flood abuse
+- Reduces backend overload risk
+- Protects `/api/*` endpoints
+
+---
+
+# Monitoring & Observability
+
+The platform includes centralized logging, telemetry, alerting, and operational visibility.
+
+## Monitoring Stack
+
+- Application Insights
+- Log Analytics
+- Azure Monitor
+- Kusto Query Language (KQL)
+- Azure Dashboards
+- Diagnostic settings
+- Metric alerts
+
+## Implemented Alerts
+
+- App Gateway backend health alerts
+- High CPU alerts
+- SQL utilization alerts
+- API traffic spike alerts
+- Failed login burst alerts
+
+---
+
+# AI-Powered Log Analysis
+
+SecureFlow Docs includes AI-assisted security analytics for suspicious API activity, WAF events, and authentication attacks.
+
+## Implemented Controls
+
+- Application Gateway access log analysis
+- WAF log analysis
+- Application Insights telemetry analysis
+- Kusto-based anomaly detection
+- AI Security Summary evidence
+
+## Detection Logic
+
+### API Traffic Spike Detection
+
+Detects concentrated `/api/*` traffic bursts from individual clients.
+
+### Failed Login Burst Detection
+
+Detects repeated failed login attempts within short time windows.
+
+## Benefits
+
+- Faster security investigations
+- Improved operational visibility
+- Demonstrates AI-assisted SOC concepts
+- Extensible to Azure OpenAI integration
+
+---
+
+# Compliance Mode
+
+SecureFlow Docs includes audit-style governance and CIS-aligned Azure Policy controls.
+
+## Implemented Controls
+
+- Custom CIS-style Azure Policy initiative
+- Azure Policy assignment
+- Security Center recommendation review
+- Audit-only governance mode
+
+## Governance Checks
+
+- SQL public access disabled
+- No compute public IP exposure
+- Mandatory Application Gateway WAF usage
+
+## Compliance Result
+
+- Demonstrated governance posture:
+  - `100% Compliant`
+
+---
+
+# Backup & Disaster Recovery
+
+SecureFlow Docs includes enterprise-style backup and disaster recovery controls.
+
+## Implemented Controls
+
+- Recovery Services Vault
+- Geo-redundant backup storage
+- Daily VM backups
+- Azure SQL Point-in-Time Restore
+- Long-term SQL retention policies
+- Soft delete enabled
+
+## Recovery Objectives
+
+- VM backup RPO under 24 hours
+- SQL PITR recovery support
+- Controlled database recovery process
+
+---
+
+# Cost Monitoring & FinOps
+
+SecureFlow Docs includes operational cost governance and FinOps controls.
+
+## Implemented Controls
+
+- Monthly Azure budget
+- Budget alerts
+- Forecast alerts
+- Cost anomaly detection
+- Cost Management dashboard views
+
+## Budget Rules
+
+- 50% budget alert
+- 80% budget alert
+- 100% forecast alert
+
+## Benefits
+
+- Prevents unexpected cloud spending
+- Demonstrates FinOps operational awareness
+- Maintains predictable infrastructure costs
+
+---
+
+# Dynamic Application Security Testing (DAST)
+
+The platform performs external security validation using OWASP ZAP.
+
+## Implemented Controls
+
+- OWASP ZAP baseline scanning
+- Self-hosted GitHub Actions runner
+- Automated DAST workflows
+- HTML/JSON/Markdown reports
+
+## Validation Scope
+
+- Public Application Gateway URL
+- HTTPS validation
+- API exposure checks
+- Header and cookie inspection
+
+## Benefits
+
+- Tests the live deployed environment
+- Validates external attack surface
+- Complements SAST and SonarQube scanning
+
+---
+
+# Automation & DevOps
+
+SecureFlow Docs fully automates provisioning, deployment, configuration, monitoring, and validation workflows.
+
+## Terraform
+
+Automates:
+- Networking
+- VMSS deployment
+- SQL deployment
+- WAF
+- Private Endpoints
+- Monitoring
+- Alerts
+- Backup infrastructure
+
+## Ansible
+
+Automates:
+- VM hardening
+- SonarQube deployment
+- Runtime configuration
+- Package installation
+- Secret rendering
+
+## GitHub Actions
+
+Automates:
+- Terraform workflows
+- Frontend deployment
+- Backend deployment
+- DAST scanning
+- Security validation
+- Threat intelligence refresh
+
+---
+
+# Prerequisites
+
+- Azure subscription with required permissions
+- Azure CLI
+- Terraform `>= 1.6`
+- Ansible
+- Node.js `22`
+- Java `21`
+- Maven
+- Budget/quota for Azure infrastructure resources
+
+---
+
+# Local Development
+
+## Backend
 
 ```bash
 cd apps/backend
 mvn spring-boot:run
 ```
 
-Run the frontend:
+## Frontend
 
 ```bash
 cd apps/frontend
@@ -79,104 +449,96 @@ npm install
 npm run dev
 ```
 
-Open the Vite URL and use the upload button. Vite proxies `/api` to `localhost:8080`.
+Vite proxies `/api` traffic to `localhost:8080`.
 
-## Provision Infrastructure
+---
 
-Copy the example variables and fill in secrets locally or through GitHub Actions secrets:
+# Provision Infrastructure
 
 ```bash
 cp infra/terraform/terraform.tfvars.example infra/terraform/terraform.tfvars
+
 cd infra/terraform
+
 terraform init \
   -backend-config="resource_group_name=group1_final" \
   -backend-config="storage_account_name=tfstategrp1sf26640" \
   -backend-config="container_name=tfstate" \
   -backend-config="key=secureflow-dev.tfstate"
+
 terraform plan -out=tfplan
+
 terraform apply tfplan
 ```
 
-For GitHub Actions remote state, configure these secrets:
+---
 
-- `AZURE_CLIENT_ID`
-- `AZURE_TENANT_ID`
-- `AZURE_SUBSCRIPTION_ID`
-- `TFSTATE_RESOURCE_GROUP`
-- `TFSTATE_STORAGE_ACCOUNT`
-- `TFSTATE_CONTAINER`
-- `SSH_PUBLIC_KEY`
-- `SQL_ADMIN_PASSWORD`
-- `ALERT_EMAIL`
-
-## Configure With Ansible
-
-Update `config/ansible/inventories/prod/hosts.ini` with private IPs from Terraform outputs, then run from a host that can reach the private VNet:
+# Configure With Ansible
 
 ```bash
 ansible-galaxy collection install -r config/ansible/requirements.yml
-ansible-playbook config/ansible/site.yml -i config/ansible/inventories/prod/hosts.ini
+
+ansible-playbook config/ansible/site.yml \
+  -i config/ansible/inventories/prod/hosts.ini
 ```
 
-## Deploy With GitHub Actions
+---
 
-- `.github/workflows/infra.yml`: Terraform init, fmt, validate, plan, and optional apply.
-- `.github/workflows/frontend.yml`: install, build, package, and deploy frontend.
-- `.github/workflows/backend.yml`: Maven test/package, optional SonarQube scan, and deploy backend.
+# Deploy With GitHub Actions
+
+## Workflows
+
+- `infra.yml`
+- `frontend.yml`
+- `backend.yml`
 
 Frontend and backend are intentionally independent deployables.
 
-## Automation Evidence
+---
 
-- Terraform runs from a fresh GitHub Actions checkout on the self-hosted runner, initializes the remote backend, validates, plans, and applies infrastructure with `terraform_action=apply`.
-- Remote state is stored in Azure Storage, so the workflow can start from a clean runner workspace while preserving real infrastructure state.
-- Ansible configures machines idempotently through `config/ansible/site.yml`; reruns converge package, service, nginx, backend, and SonarQube configuration instead of requiring manual server edits.
-- Frontend and backend deploy independently through GitHub Actions after build/test/package steps.
-- The self-hosted runner `secureflow-ops-runner` performs Terraform and Ansible automation from the ops VM, which can reach the private VMSS instances.
+# Validation Checklist
 
-## Validate
+## Functional Validation
 
-After deployment, run:
+- Homepage accessible through Application Gateway
+- `/api/health` returns healthy response
+- API write/read operations successful
+- SQL connectivity validated
 
-```bash
-curl -k https://135.116.238.100/
-```
+## Security Validation
 
-Acceptance proof checklist:
+- No compute public IPs
+- SQL public access disabled
+- Private DNS resolution operational
+- WAF blocking validated
 
-- Homepage loads through Application Gateway: `GET /` returns 200.
-- Backend routes through Application Gateway: `GET /api/health` returns `{"status":"UP","service":"secureflow-docs-api"}`.
-- Authenticated `POST /api/documents` creates a SQL-backed document record.
-- Authenticated `GET /api/documents` returns only records for the logged-in user/signer.
-- Frontend and backend default/public URLs are not exposed.
-- VMSS public IP lists are empty for frontend and backend.
-- SQL Server `sql-secureflow-dev.database.windows.net` has public network access disabled.
-- Private DNS resolves the SQL private endpoint.
-- App Gateway backend health probes are healthy.
-- At least three alerts exist: App Gateway backend health, VM CPU, SQL DTU.
-- Cost monitoring exists: monthly budget alert, forecasted overspend alert, anomaly alert, and Cost Management view.
-- Compliance Mode exists: CIS benchmark controls, Azure Policy assignment, Security Center recommendations, and `93%` posture documented as Azure governance evidence.
-- Backup and DR exists: Recovery Services Vault, VM backup policy, SQL PITR retention, SQL LTR policy, and recovery drill runbook.
-- AI log analysis exists: Log Analytics Kusto rules, scheduled query alerts, and AI Security Summary evidence in Azure monitoring docs.
-- Threat intelligence feed integration exists: WAF custom rule, EmergingThreats indicators, and scheduled GitHub Actions refresh workflow.
-- DAST exists: OWASP ZAP GitHub Actions workflow, reports artifact, and Azure self-hosted runner execution evidence.
-- Load balancing exists: frontend/backend internal load balancers, private backend pools, health probes, and VMSS pool targets.
-- Layer 7 flood protection exists: WAF rate-limit rule `RateLimitLayer7Flood` blocks excessive request bursts.
-- Key Vault exists: private endpoint, private DNS, secret inventory, managed-identity runtime secret fetch, and documented VMSS SSH jump-host access.
+## Monitoring Validation
 
-## Azure Dashboard Snapshot
+- Application Insights telemetry operational
+- Log Analytics data collection active
+- Alerts successfully configured
 
-The project includes a dashboard-style monitoring snapshot for submission:
+---
+
+# Azure Dashboard Snapshot
 
 ![Azure operations dashboard snapshot](docs/screenshots/azure-dashboard-snapshot.svg)
 
-This snapshot summarizes the Azure operations view used in the demo: Application Gateway WAF health, Log Analytics diagnostics, Application Insights telemetry, alerts, cost controls, compliance posture, backup/DR, private access, and automation status.
+The dashboard summarizes:
+- Application Gateway health
+- WAF monitoring
+- Log Analytics diagnostics
+- Application Insights telemetry
+- Cost monitoring
+- Compliance posture
+- Backup and DR readiness
+- Automation status
 
-## Kusto Queries
+---
 
-Run these in Azure Portal at **Log Analytics workspaces** > `law-secureflow-dev` > **Logs**.
+# Kusto Queries
 
-Application Gateway access logs:
+## Application Gateway Access Logs
 
 ```kusto
 AzureDiagnostics
@@ -186,7 +548,7 @@ AzureDiagnostics
 | order by TimeGenerated desc
 ```
 
-Application Gateway WAF blocks:
+## WAF Block Events
 
 ```kusto
 AzureDiagnostics
@@ -195,7 +557,7 @@ AzureDiagnostics
 | order by Blocks desc
 ```
 
-Application request failures from Application Insights:
+## Application Failures
 
 ```kusto
 requests
@@ -203,39 +565,24 @@ requests
 | summarize failures=countif(success == false), total=count() by bin(timestamp, 5m)
 ```
 
-API traffic spike detection:
+---
 
-```kusto
-AzureDiagnostics
-| where TimeGenerated > ago(10m)
-| where Category in ("ApplicationGatewayAccessLog", "ApplicationGatewayFirewallLog")
-| extend RequestUri = tostring(column_ifexists("requestUri_s", ""))
-| extend ClientIP = tostring(column_ifexists("clientIP_s", "unknown"))
-| where RequestUri startswith "/api"
-| summarize RequestCount = count() by bin(TimeGenerated, 5m), ClientIP, RequestUri
-| where RequestCount > 100
-```
-
-Failed login burst detection:
-
-```kusto
-let FailedLoginRequests = union isfuzzy=true
-  (requests
-    | project TimeGenerated = timestamp, Url = tostring(url), ResultCode = tostring(resultCode), ClientIP = tostring(client_IP)),
-  (AppRequests
-    | project TimeGenerated, Url = tostring(Url), ResultCode = tostring(ResultCode), ClientIP = tostring(ClientIP));
-FailedLoginRequests
-| where TimeGenerated > ago(10m)
-| where Url has "/api/auth/login"
-| where ResultCode in ("401", "403")
-| summarize FailedAttempts = count() by bin(TimeGenerated, 5m), ClientIP
-| where FailedAttempts > 5
-```
+# Verified Deployment
 
 Verified deployment on April 30, 2026:
 
-- `terraform apply`: complete, all resources in `group1_final`.
-- Ansible: common, SonarQube, frontend, and backend plays completed with zero failures.
-- App Gateway backend health: frontend `10.2.2.4` healthy, backend `10.2.3.4` healthy.
-- E2E API test through gateway from ops VM: login as `automission@company.com`, upload `secureflow-test-contract.txt`, read document ID `1`.
-- SonarQube: reachable on the ops VM at `http://127.0.0.1:9000`.
+- Terraform deployment completed successfully
+- Ansible completed with zero failures
+- Frontend and backend health probes healthy
+- End-to-end API validation successful
+- SonarQube operational on ops VM
+
+---
+
+# Runbook
+
+Operational deployment, recovery, troubleshooting, and maintenance procedures are documented separately:
+
+```text
+docs/runbook.md
+```
