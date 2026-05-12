@@ -164,7 +164,7 @@ export function App() {
             </button>
             <button className="ghost-button" onClick={handleLogout}>
               <LogOut size={18} aria-hidden="true" />
-              Logout {session.email}
+              Logout
             </button>
             <span className="gateway-pill">
               <ShieldCheck size={18} aria-hidden="true" />
