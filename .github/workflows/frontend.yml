@@ -48,10 +48,10 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
-      RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP_NAME || 'rg-secureflow-project2' }}
-      STORAGE_ACCOUNT: ${{ vars.ARTIFACT_STORAGE_ACCOUNT || 'tfstatesfdocs2duyghu' }}
-      ARTIFACT_CONTAINER: ${{ vars.ARTIFACT_CONTAINER || 'artifacts' }}
-      FRONTEND_VMSS_NAME: ${{ vars.FRONTEND_VMSS_NAME || 'vmss-secureflow-dev-frontend' }}
+      RESOURCE_GROUP: rg-secureflow-project2
+      STORAGE_ACCOUNT: tfstatesfdocs2duyghu
+      ARTIFACT_CONTAINER: artifacts
+      FRONTEND_VMSS_NAME: vmss-secureflow-dev-frontend
     steps:
       - uses: actions/download-artifact@v4
         with:

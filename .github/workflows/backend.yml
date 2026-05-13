@@ -65,10 +65,10 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
-      RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP_NAME || 'rg-secureflow-project2' }}
-      STORAGE_ACCOUNT: ${{ vars.ARTIFACT_STORAGE_ACCOUNT || 'tfstatesfdocs2duyghu' }}
-      ARTIFACT_CONTAINER: ${{ vars.ARTIFACT_CONTAINER || 'artifacts' }}
-      BACKEND_VMSS_NAME: ${{ vars.BACKEND_VMSS_NAME || 'vmss-secureflow-dev-backend' }}
+      RESOURCE_GROUP: rg-secureflow-project2
+      STORAGE_ACCOUNT: tfstatesfdocs2duyghu
+      ARTIFACT_CONTAINER: artifacts
+      BACKEND_VMSS_NAME: vmss-secureflow-dev-backend
       KEY_VAULT_URI: ${{ vars.KEY_VAULT_URI || 'https://kv-sfdocs-f2dd4d.vault.azure.net/' }}
       SQL_SERVER_FQDN: ${{ vars.SQL_SERVER_FQDN || 'sql-secureflow-dev.database.windows.net' }}
       SQL_DATABASE_NAME: ${{ vars.SQL_DATABASE_NAME || 'sqldb-secureflow-docs' }}
