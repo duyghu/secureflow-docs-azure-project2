@@ -52,6 +52,7 @@ jobs:
       STORAGE_ACCOUNT: tfstatesfdocs2duyghu
       ARTIFACT_CONTAINER: artifacts
       FRONTEND_VMSS_NAME: vmss-secureflow-dev-frontend
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -63,6 +64,14 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Ensure artifact storage RBAC
+        run: |
+          set -euo pipefail
+          STORAGE_SCOPE=$(az storage account show -n "$STORAGE_ACCOUNT" -g "$RESOURCE_GROUP" --query id -o tsv)
+          az role assignment create --assignee "$AZURE_CLIENT_ID" --role "Storage Account Key Operator Service Role" --scope "$STORAGE_SCOPE" --only-show-errors >/dev/null || true
+          az role assignment create --assignee "$AZURE_CLIENT_ID" --role "Storage Blob Data Contributor" --scope "$STORAGE_SCOPE" --only-show-errors >/dev/null || true
+          sleep 30
 
       - name: Upload frontend artifact to private deployment storage
         run: |

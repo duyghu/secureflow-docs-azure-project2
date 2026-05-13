@@ -69,6 +69,7 @@ jobs:
       STORAGE_ACCOUNT: tfstatesfdocs2duyghu
       ARTIFACT_CONTAINER: artifacts
       BACKEND_VMSS_NAME: vmss-secureflow-dev-backend
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       KEY_VAULT_URI: ${{ vars.KEY_VAULT_URI || 'https://kv-sfdocs-f2dd4d.vault.azure.net/' }}
       SQL_SERVER_FQDN: ${{ vars.SQL_SERVER_FQDN || 'sql-secureflow-dev.database.windows.net' }}
       SQL_DATABASE_NAME: ${{ vars.SQL_DATABASE_NAME || 'sqldb-secureflow-docs' }}
@@ -85,6 +86,14 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Ensure artifact storage RBAC
+        run: |
+          set -euo pipefail
+          STORAGE_SCOPE=$(az storage account show -n "$STORAGE_ACCOUNT" -g "$RESOURCE_GROUP" --query id -o tsv)
+          az role assignment create --assignee "$AZURE_CLIENT_ID" --role "Storage Account Key Operator Service Role" --scope "$STORAGE_SCOPE" --only-show-errors >/dev/null || true
+          az role assignment create --assignee "$AZURE_CLIENT_ID" --role "Storage Blob Data Contributor" --scope "$STORAGE_SCOPE" --only-show-errors >/dev/null || true
+          sleep 30
 
       - name: Upload backend artifact to private deployment storage
         run: |
