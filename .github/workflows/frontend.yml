@@ -67,14 +67,14 @@ jobs:
       - name: Upload frontend artifact to private deployment storage
         run: |
           set -euo pipefail
-          az storage container create --account-name "$STORAGE_ACCOUNT" --name "$ARTIFACT_CONTAINER" --auth-mode login --only-show-errors >/dev/null
+          az storage container create --account-name "$STORAGE_ACCOUNT" --name "$ARTIFACT_CONTAINER" --auth-mode key --only-show-errors >/dev/null
           az storage blob upload \
             --account-name "$STORAGE_ACCOUNT" \
             --container-name "$ARTIFACT_CONTAINER" \
             --name secureflow-frontend-dist.tar.gz \
             --file apps/frontend/dist.tar.gz \
             --overwrite \
-            --auth-mode login \
+            --auth-mode key \
             --only-show-errors >/dev/null
 
       - name: Deploy frontend to private VMSS through Azure Run Command
@@ -88,13 +88,12 @@ jobs:
             --permissions r \
             --expiry "$EXPIRY" \
             --full-uri \
-            --auth-mode login \
-            --as-user \
+            --auth-mode key \
             --only-show-errors \
             -o tsv)
 
           SCRIPT=$(cat <<SCRIPT_EOF
-          set -euo pipefail
+          set -eu
           install -d -m 755 /opt/secureflow/frontend
           curl -fsSL '$ARTIFACT_URL' -o /tmp/secureflow-frontend-dist.tar.gz
           rm -rf /opt/secureflow/frontend/*
@@ -117,7 +116,11 @@ jobs:
           systemctl daemon-reload
           systemctl enable --now secureflow-frontend
           systemctl restart secureflow-frontend
-          curl -fsS http://127.0.0.1/health
+          for attempt in 1 2 3 4 5; do
+            curl -fsS http://127.0.0.1/health && exit 0
+            sleep 2
+          done
+          exit 1
           SCRIPT_EOF
           )
 

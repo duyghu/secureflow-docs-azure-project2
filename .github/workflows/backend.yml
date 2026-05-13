@@ -43,6 +43,10 @@ jobs:
             echo "SONAR_TOKEN is empty. Skipping SonarQube scan."
             exit 0
           fi
+          if [ "$SONAR_HOST_URL" = "http://127.0.0.1:9000" ] || [ "$SONAR_HOST_URL" = "http://localhost:9000" ]; then
+            echo "SONAR_HOST_URL points to a local/private SonarQube instance. Skipping scan from GitHub-hosted runner."
+            exit 0
+          fi
 
           mvn -B sonar:sonar \
             -Dsonar.projectKey=secureflow-docs-azure-project2 \
@@ -85,14 +89,14 @@ jobs:
       - name: Upload backend artifact to private deployment storage
         run: |
           set -euo pipefail
-          az storage container create --account-name "$STORAGE_ACCOUNT" --name "$ARTIFACT_CONTAINER" --auth-mode login --only-show-errors >/dev/null
+          az storage container create --account-name "$STORAGE_ACCOUNT" --name "$ARTIFACT_CONTAINER" --auth-mode key --only-show-errors >/dev/null
           az storage blob upload \
             --account-name "$STORAGE_ACCOUNT" \
             --container-name "$ARTIFACT_CONTAINER" \
             --name secureflow-docs-backend.jar \
             --file apps/backend/target/secureflow-docs-backend-0.1.0.jar \
             --overwrite \
-            --auth-mode login \
+            --auth-mode key \
             --only-show-errors >/dev/null
 
       - name: Deploy backend to private VMSS through Azure Run Command
@@ -106,42 +110,50 @@ jobs:
             --permissions r \
             --expiry "$EXPIRY" \
             --full-uri \
-            --auth-mode login \
-            --as-user \
+            --auth-mode key \
             --only-show-errors \
             -o tsv)
 
           SCRIPT=$(cat <<SCRIPT_EOF
-          set -euo pipefail
+          set -eu
           install -d -m 755 /opt/secureflow/backend /opt/secureflow/java
           if [ ! -x /opt/secureflow/java/bin/java ]; then
             curl -fsSL '$JRE_URL' -o /tmp/temurin21-jre.tar.gz
             tar -xzf /tmp/temurin21-jre.tar.gz -C /opt/secureflow/java --strip-components=1
           fi
           curl -fsSL '$ARTIFACT_URL' -o /opt/secureflow/backend/secureflow-docs-api.jar
-          printf '%s\n' \
-            '[Unit]' \
-            'Description=SecureFlow Docs API' \
-            'After=network-online.target' \
-            '' \
-            '[Service]' \
-            'Environment=KEY_VAULT_URI=$KEY_VAULT_URI' \
-            'Environment=SQL_SERVER_FQDN=$SQL_SERVER_FQDN' \
-            'Environment=SQL_DATABASE_NAME=$SQL_DATABASE_NAME' \
-            'Environment=SECUREFLOW_DEFAULT_PASSWORD=$SECUREFLOW_DEFAULT_PASSWORD' \
-            'WorkingDirectory=/opt/secureflow/backend' \
-            'ExecStart=/opt/secureflow/java/bin/java -jar /opt/secureflow/backend/secureflow-docs-api.jar' \
-            'Restart=always' \
-            'RestartSec=8' \
-            '' \
-            '[Install]' \
-            'WantedBy=multi-user.target' \
-            > /etc/systemd/system/secureflow-api.service
+          touch /etc/secureflow-api.env
+          if grep -q '^SECUREFLOW_DEFAULT_PASSWORD=' /etc/secureflow-api.env; then
+            sed -i 's/^SECUREFLOW_DEFAULT_PASSWORD=.*/SECUREFLOW_DEFAULT_PASSWORD=$SECUREFLOW_DEFAULT_PASSWORD/' /etc/secureflow-api.env
+          else
+            printf '\nSECUREFLOW_DEFAULT_PASSWORD=$SECUREFLOW_DEFAULT_PASSWORD\n' >> /etc/secureflow-api.env
+          fi
+          if [ ! -f /etc/systemd/system/secureflow-api.service ]; then
+            printf '%s\n' \
+              '[Unit]' \
+              'Description=SecureFlow Docs API' \
+              'After=network.target' \
+              '' \
+              '[Service]' \
+              'WorkingDirectory=/opt/secureflow/backend' \
+              'Environment=SERVER_PORT=8080' \
+              'EnvironmentFile=-/etc/secureflow-api.env' \
+              'ExecStart=/opt/secureflow/java/bin/java -jar /opt/secureflow/backend/secureflow-docs-api.jar' \
+              'Restart=always' \
+              'RestartSec=10' \
+              '' \
+              '[Install]' \
+              'WantedBy=multi-user.target' \
+              > /etc/systemd/system/secureflow-api.service
+          fi
           systemctl daemon-reload
           systemctl enable --now secureflow-api
           systemctl restart secureflow-api
-          sleep 15
-          curl -fsS http://127.0.0.1:8080/api/health
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            curl -fsS http://127.0.0.1:8080/api/health && exit 0
+            sleep 3
+          done
+          exit 1
           SCRIPT_EOF
           )
 
