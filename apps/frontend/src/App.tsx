@@ -68,7 +68,7 @@ export function App() {
     [documents, currentEmail]
   );
 
-  const signatureInbox = documents.filter((doc) => doc.signerEmail === currentEmail);
+  const signatureInbox = documents.filter((doc) => doc.signerEmail === currentEmail && !doc.signatureStatus.includes("Signed"));
   const sentForSignature = documents.filter((doc) => doc.ownerUsername === currentEmail);
 
   async function handleAuthSubmit(event: FormEvent<HTMLFormElement>) {

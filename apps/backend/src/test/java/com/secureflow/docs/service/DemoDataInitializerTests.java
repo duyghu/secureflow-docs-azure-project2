@@ -83,6 +83,11 @@ class DemoDataInitializerTests {
         "Vendor Risk Exception Approval".equals(document.getTitle())
             && DEMO_EMAIL.equals(document.getSignerEmail())
             && READY_FOR_MY_SIGNATURE.equals(document.getSignatureStatus())));
+
+    verify(repository).save(org.mockito.ArgumentMatchers.argThat(document ->
+        "Mutual NDA Countersignature".equals(document.getTitle())
+            && DEMO_EMAIL.equals(document.getSignerEmail())
+            && READY_FOR_MY_SIGNATURE.equals(document.getSignatureStatus())));
   }
 
   @Test
@@ -104,6 +109,11 @@ class DemoDataInitializerTests {
             && "vendor.risk@company.com".equals(document.getOwnerUsername())
             && DEMO_EMAIL.equals(document.getSignerEmail())));
 
+    verify(repository).save(org.mockito.ArgumentMatchers.argThat(document ->
+        "Mutual NDA Countersignature".equals(document.getTitle())
+            && "commercial.legal@company.com".equals(document.getOwnerUsername())
+            && DEMO_EMAIL.equals(document.getSignerEmail())));
+
     verify(repository, times(2)).findAll();
     verify(repository, times(2))
         .findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(anyString(), anyString());
@@ -117,9 +127,12 @@ class DemoDataInitializerTests {
     DocumentRecord vendorRisk = documentOwnedBy(DEMO_EMAIL);
     vendorRisk.setTitle("Vendor Risk Exception Approval");
 
-    when(repository.findAll()).thenReturn(List.of(boardResolution, vendorRisk));
+    DocumentRecord ndaCountersignature = documentOwnedBy(DEMO_EMAIL);
+    ndaCountersignature.setTitle("Mutual NDA Countersignature");
+
+    when(repository.findAll()).thenReturn(List.of(boardResolution, vendorRisk, ndaCountersignature));
     when(repository.findByOwnerUsernameOrSignerEmailOrderByCreatedAtDesc(DEMO_EMAIL, DEMO_EMAIL))
-        .thenReturn(List.of(boardResolution, vendorRisk));
+        .thenReturn(List.of(boardResolution, vendorRisk, ndaCountersignature));
 
     initializer.run();
 

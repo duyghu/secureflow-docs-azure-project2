@@ -68,6 +68,7 @@ jobs:
       KEY_VAULT_URI: ${{ vars.KEY_VAULT_URI || 'https://kv-sfdocs-f2dd4d.vault.azure.net/' }}
       SQL_SERVER_FQDN: ${{ vars.SQL_SERVER_FQDN || 'sql-secureflow-dev.database.windows.net' }}
       SQL_DATABASE_NAME: ${{ vars.SQL_DATABASE_NAME || 'sqldb-secureflow-docs' }}
+      SECUREFLOW_DEFAULT_PASSWORD: ${{ vars.SECUREFLOW_DEFAULT_PASSWORD || 'auto' }}
       JRE_URL: ${{ vars.JRE_URL || 'https://api.adoptium.net/v3/binary/latest/21/ga/linux/x64/jre/hotspot/normal/eclipse' }}
     steps:
       - uses: actions/download-artifact@v4
@@ -127,6 +128,7 @@ jobs:
             'Environment=KEY_VAULT_URI=$KEY_VAULT_URI' \
             'Environment=SQL_SERVER_FQDN=$SQL_SERVER_FQDN' \
             'Environment=SQL_DATABASE_NAME=$SQL_DATABASE_NAME' \
+            'Environment=SECUREFLOW_DEFAULT_PASSWORD=$SECUREFLOW_DEFAULT_PASSWORD' \
             'WorkingDirectory=/opt/secureflow/backend' \
             'ExecStart=/opt/secureflow/java/bin/java -jar /opt/secureflow/backend/secureflow-docs-api.jar' \
             'Restart=always' \

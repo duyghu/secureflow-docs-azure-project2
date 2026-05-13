@@ -74,6 +74,8 @@ public class DemoDataInitializer implements CommandLineRunner {
         .anyMatch(document -> "Board Resolution Signature Packet".equalsIgnoreCase(document.getTitle()));
     boolean vendorRiskExists = mailboxRecords.stream()
         .anyMatch(document -> "Vendor Risk Exception Approval".equalsIgnoreCase(document.getTitle()));
+    boolean ndaCountersignatureExists = mailboxRecords.stream()
+        .anyMatch(document -> "Mutual NDA Countersignature".equalsIgnoreCase(document.getTitle()));
 
     if (!boardResolutionExists) {
       repository.save(demoRecord(new DemoRecordData(
@@ -101,6 +103,20 @@ public class DemoDataInitializer implements CommandLineRunner {
           "vendor-risk-exception-approval.pdf",
           176512L,
           "Risk office routed a vendor exception memo for controlled signature approval.")));
+    }
+
+    if (!ndaCountersignatureExists) {
+      repository.save(demoRecord(new DemoRecordData(
+          "Mutual NDA Countersignature",
+          "Legal",
+          "Signature requested",
+          "commercial.legal@company.com",
+          DEMO_EMAIL,
+          "Ready for my signature",
+          "Due Friday",
+          "mutual-nda-countersignature.pdf",
+          128640L,
+          "Commercial legal assigned a mutual NDA for signer verification before partner onboarding.")));
     }
   }
 
