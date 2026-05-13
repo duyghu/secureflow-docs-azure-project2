@@ -196,10 +196,14 @@ export function App() {
         ))}
       </section>
 
-      <section className="documents">
-        <div>
-          <p className="eyebrow">Signer workspace</p>
-          <h2>Documents Awaiting My Signature</h2>
+      <section className="documents documents--inbox">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Signer workspace</p>
+            <h2>Documents Awaiting My Signature</h2>
+            <p className="section-summary">Priority envelopes assigned to your corporate identity for review, approval, and signature capture.</p>
+          </div>
+          <span className="section-count">{signatureInbox.length} active requests</span>
         </div>
         {error ? <p className="error">{error}</p> : null}
         <div className="table" role="table" aria-label="Documents">
@@ -215,9 +219,9 @@ export function App() {
                 <BadgeCheck size={16} aria-hidden="true" />
                 {doc.title}
               </span>
-              <span>{doc.category}</span>
-              <span>{doc.signatureStatus}</span>
-              <span>{doc.ownerUsername}</span>
+              <span className="category-pill">{doc.category}</span>
+              <span className="status-pill">{doc.signatureStatus}</span>
+              <span className="requester-cell">{doc.ownerUsername}</span>
             </div>
           ))}
           {signatureInbox.length === 0 ? <p className="empty">No signature requests are currently assigned to {session.email}.</p> : null}
@@ -225,9 +229,13 @@ export function App() {
       </section>
 
       <section className="documents documents--sent">
-        <div>
-          <p className="eyebrow">Owner workspace</p>
-          <h2>Documents I Sent for Signature</h2>
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Owner workspace</p>
+            <h2>Documents I Sent for Signature</h2>
+            <p className="section-summary">Outbound envelopes prepared by you, grouped by signer, deadline, and workflow state.</p>
+          </div>
+          <span className="section-count">{sentForSignature.length} sent envelopes</span>
         </div>
         <div className="table" role="table" aria-label="Sent documents">
           <div className="table-row table-head" role="row">
@@ -242,9 +250,9 @@ export function App() {
                 <Send size={16} aria-hidden="true" />
                 {doc.title}
               </span>
-              <span>{doc.signerEmail}</span>
-              <span>{doc.signatureDeadline ?? "Standard SLA"}</span>
-              <span>{doc.signatureStatus}</span>
+              <span className="requester-cell">{doc.signerEmail}</span>
+              <span className="deadline-pill">{doc.signatureDeadline ?? "Standard SLA"}</span>
+              <span className="status-pill status-pill--muted">{doc.signatureStatus}</span>
             </div>
           ))}
           {sentForSignature.length === 0 ? <p className="empty">No outbound signature envelopes have been prepared yet.</p> : null}
