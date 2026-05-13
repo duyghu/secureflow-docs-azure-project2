@@ -55,14 +55,15 @@ README.md
 
 ## Core Infrastructure
 
-- Existing resource group: `group1_final`
-- Existing VNet: `group1-final-vnet`
-- Ops VM: `group1-final`
+- Existing resource group: `rg-secureflow-project2`
+- Existing VNet: `vnet-secure-app` (`10.0.0.0/16`, West Europe)
+- Deployment control plane: GitHub Actions using Azure VMSS Run Command
 - Private subnets:
-  - `snet-appgw`
-  - `snet-web`
-  - `snet-api`
-  - `snet-data`
+  - `snet-secureflow-dev-appgw` (`10.0.11.0/24`)
+  - `snet-secureflow-dev-web` (`10.0.12.0/24`)
+  - `snet-secureflow-dev-api` (`10.0.13.0/24`)
+  - `snet-secureflow-dev-data` (`10.0.14.0/24`)
+  - `AzureBastionSubnet` (`10.0.6.0/26`)
 
 ## Traffic Architecture
 
@@ -88,10 +89,7 @@ Internet
 - Azure SQL public network access is disabled.
 - SQL access uses Private Endpoint + Private DNS.
 - Internal Load Balancers remain private.
-- Administrative access uses:
-  - Azure Bastion
-  - Ops VM jump host
-  - Private networking
+- Administrative access uses Azure control-plane VMSS Run Command for deployment. `AzureBastionSubnet` is prepared in Terraform; creating the Bastion host is blocked until the subscription public IP quota in West Europe is increased or unused public IPs are deleted.
 
 ---
 
@@ -461,7 +459,7 @@ cp infra/terraform/terraform.tfvars.example infra/terraform/terraform.tfvars
 cd infra/terraform
 
 terraform init \
-  -backend-config="resource_group_name=group1_final" \
+  -backend-config="resource_group_name=rg-secureflow-project2" \
   -backend-config="storage_account_name=tfstategrp1sf26640" \
   -backend-config="container_name=tfstate" \
   -backend-config="key=secureflow-dev.tfstate"
@@ -569,10 +567,10 @@ requests
 
 # Verified Deployment
 
-Verified deployment on April 30, 2026:
+Verified deployment on May 13, 2026:
 
 - Terraform deployment completed successfully
-- Ansible completed with zero failures
+- GitHub Actions deployment path updated to use Azure VMSS Run Command for private VMSS tiers
 - Frontend and backend health probes healthy
 - End-to-end API validation successful
 - SonarQube operational on ops VM

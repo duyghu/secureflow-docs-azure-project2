@@ -64,7 +64,7 @@
 
   <!-- ================== TITLE ================== -->
   <text x="900" y="42" text-anchor="middle" font-size="26" font-weight="700" fill="#243A5E">SecureFlow Docs — Azure 3-Tier Reference Architecture</text>
-  <text x="900" y="66" text-anchor="middle" font-size="13" fill="#605E5C">Resource Group: group1_final  •  Region: Sweden Central  •  Single public ingress via Application Gateway (WAF v2)</text>
+  <text x="900" y="66" text-anchor="middle" font-size="13" fill="#605E5C">Resource Group: rg-secureflow-project2  •  Region: West Europe  •  Single public ingress via Application Gateway (WAF v2)</text>
 
   <!-- ================== LEGEND ================== -->
   <g transform="translate(30, 88)">
@@ -91,7 +91,7 @@
       <text x="156" y="22">Telemetry</text>
       <line x1="220" y1="17" x2="250" y2="17" stroke="#107C10" stroke-width="2"/>
       <text x="256" y="22">Private link</text>
-      <text x="335" y="22" font-weight="600">VNet 10.2.0.0/16</text>
+      <text x="335" y="22" font-weight="600">VNet 10.0.0.0/16</text>
     </g>
   </g>
 
@@ -123,7 +123,7 @@
   <g>
     <rect x="60" y="245" width="1680" height="775" rx="14" fill="url(#rgGrad)" stroke="#0078D4" stroke-width="2"/>
     <rect x="60" y="245" width="280" height="28" rx="14" fill="#0078D4"/>
-    <text x="76" y="264" font-size="13" font-weight="700" fill="#FFFFFF">⬡  Resource Group · group1_final</text>
+    <text x="76" y="264" font-size="13" font-weight="700" fill="#FFFFFF">⬡  Resource Group · rg-secureflow-project2</text>
   </g>
 
   <!-- ================== PUBLIC IP (just inside RG) ================== -->
@@ -148,13 +148,13 @@
   <g>
     <rect x="320" y="295" width="1180" height="700" rx="12" fill="url(#vnetGrad)" stroke="#0078D4" stroke-width="1.5" stroke-dasharray="6,3"/>
     <rect x="320" y="295" width="350" height="26" rx="13" fill="#243A5E"/>
-    <text x="335" y="313" font-size="12" font-weight="700" fill="#FFFFFF">⬢  VNet · group1-final-vnet · 10.2.0.0/16</text>
+    <text x="335" y="313" font-size="12" font-weight="700" fill="#FFFFFF">⬢  VNet · vnet-secure-app · 10.0.0.0/16</text>
   </g>
 
   <!-- ============== SUBNET: snet-appgw ============== -->
   <g>
     <rect x="345" y="340" width="1130" height="120" rx="10" fill="url(#appgwSubGrad)" stroke="#D13438" stroke-width="1.2" stroke-dasharray="4,2"/>
-    <text x="360" y="358" font-size="12" font-weight="700" fill="#A4262C">snet-appgw  ·  10.2.1.0/24</text>
+    <text x="360" y="358" font-size="12" font-weight="700" fill="#A4262C">snet-secureflow-dev-appgw  ·  10.0.11.0/24</text>
 
     <!-- App Gateway WAF v2 -->
     <g transform="translate(540, 366)">
@@ -176,7 +176,7 @@
   <!-- ============== SUBNET: snet-web (frontend) ============== -->
   <g>
     <rect x="345" y="480" width="540" height="200" rx="10" fill="url(#webGrad)" stroke="#CA8A4F" stroke-width="1.2" stroke-dasharray="4,2"/>
-    <text x="360" y="498" font-size="12" font-weight="700" fill="#7A4F1B">snet-web  ·  10.2.2.0/24  ·  Frontend tier</text>
+    <text x="360" y="498" font-size="12" font-weight="700" fill="#7A4F1B">snet-secureflow-dev-web  ·  10.0.12.0/24  ·  Frontend tier</text>
 
     <!-- ILB -->
     <g transform="translate(370, 510)">
@@ -195,7 +195,7 @@
       <g transform="translate(20, 50)">
         <rect width="60" height="40" rx="4" fill="#FFF4E5" stroke="#CA8A4F"/>
         <text x="30" y="18" text-anchor="middle" font-size="9" font-weight="700" fill="#7A4F1B">VM 1</text>
-        <text x="30" y="32" text-anchor="middle" font-size="9" fill="#605E5C">10.2.2.4</text>
+        <text x="30" y="32" text-anchor="middle" font-size="9" fill="#605E5C">VMSS private</text>
       </g>
       <g transform="translate(90, 50)">
         <rect width="60" height="40" rx="4" fill="#FFF4E5" stroke="#CA8A4F"/>
@@ -221,7 +221,7 @@
   <!-- ============== SUBNET: snet-api (backend) ============== -->
   <g>
     <rect x="905" y="480" width="570" height="200" rx="10" fill="url(#apiGrad)" stroke="#107C10" stroke-width="1.2" stroke-dasharray="4,2"/>
-    <text x="920" y="498" font-size="12" font-weight="700" fill="#0E5814">snet-api  ·  10.2.3.0/24  ·  Backend tier</text>
+    <text x="920" y="498" font-size="12" font-weight="700" fill="#0E5814">snet-secureflow-dev-api  ·  10.0.13.0/24  ·  Backend tier</text>
 
     <!-- ILB -->
     <g transform="translate(930, 510)">
@@ -239,7 +239,7 @@
       <g transform="translate(20, 50)">
         <rect width="65" height="40" rx="4" fill="#E5F2E5" stroke="#107C10"/>
         <text x="32" y="18" text-anchor="middle" font-size="9" font-weight="700" fill="#0E5814">VM 1</text>
-        <text x="32" y="32" text-anchor="middle" font-size="9" fill="#605E5C">10.2.3.4</text>
+        <text x="32" y="32" text-anchor="middle" font-size="9" fill="#605E5C">VMSS private</text>
       </g>
       <g transform="translate(95, 50)">
         <rect width="65" height="40" rx="4" fill="#E5F2E5" stroke="#107C10"/>
@@ -265,7 +265,7 @@
   <!-- ============== SUBNET: snet-data ============== -->
   <g>
     <rect x="345" y="700" width="800" height="270" rx="10" fill="url(#dataGrad)" stroke="#5C2D91" stroke-width="1.2" stroke-dasharray="4,2"/>
-    <text x="360" y="718" font-size="12" font-weight="700" fill="#3D1A78">snet-data  ·  10.2.4.0/24  ·  Data tier (private endpoints only)</text>
+    <text x="360" y="718" font-size="12" font-weight="700" fill="#3D1A78">snet-secureflow-dev-data  ·  10.0.14.0/24  ·  Data tier (private endpoints only)</text>
 
     <!-- SQL PE + SQL Server -->
     <g transform="translate(370, 740)">
@@ -296,12 +296,12 @@
       <g transform="translate(40, 40)">
         <rect width="320" height="36" rx="6" fill="#F5EFFA"/>
         <text x="160" y="16" text-anchor="middle" font-size="10" font-weight="600" fill="#3D1A78">privatelink.database.windows.net</text>
-        <text x="160" y="29" text-anchor="middle" font-size="9" fill="#605E5C">resolves SQL FQDN → 10.2.4.x</text>
+        <text x="160" y="29" text-anchor="middle" font-size="9" fill="#605E5C">resolves SQL FQDN → 10.0.14.x</text>
       </g>
       <g transform="translate(390, 40)">
         <rect width="320" height="36" rx="6" fill="#F5EFFA"/>
         <text x="160" y="16" text-anchor="middle" font-size="10" font-weight="600" fill="#3D1A78">privatelink.vaultcore.azure.net</text>
-        <text x="160" y="29" text-anchor="middle" font-size="9" fill="#605E5C">resolves Key Vault FQDN → 10.2.4.x</text>
+        <text x="160" y="29" text-anchor="middle" font-size="9" fill="#605E5C">resolves Key Vault FQDN → 10.0.14.x</text>
       </g>
     </g>
   </g>
@@ -309,21 +309,21 @@
   <!-- ============== SUBNET: snet-ops + bastion ============== -->
   <g>
     <rect x="1165" y="700" width="310" height="270" rx="10" fill="url(#opsGrad)" stroke="#A4262C" stroke-width="1.2" stroke-dasharray="4,2"/>
-    <text x="1180" y="718" font-size="12" font-weight="700" fill="#A4262C">snet-ops + AzureBastionSubnet</text>
+    <text x="1180" y="718" font-size="12" font-weight="700" fill="#A4262C">AzureBastionSubnet + Run Command</text>
 
     <!-- Bastion -->
     <g transform="translate(1185, 736)">
       <rect width="270" height="58" rx="8" fill="#FFFFFF" stroke="#A4262C" stroke-width="1.3" filter="url(#shadow)"/>
       <text x="135" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#A4262C">🖧  Azure Bastion</text>
-      <text x="135" y="36" text-anchor="middle" font-size="10" font-weight="600" fill="#323130">group1-final-vnet-bastion</text>
+      <text x="135" y="36" text-anchor="middle" font-size="10" font-weight="600" fill="#323130">vnet-secure-app-bastion</text>
       <text x="135" y="50" text-anchor="middle" font-size="9" fill="#605E5C">Browser-based SSH/RDP, no public IP on VMs</text>
     </g>
 
     <!-- Ops VM -->
     <g transform="translate(1185, 802)">
       <rect width="270" height="78" rx="8" fill="#FFFFFF" stroke="#A4262C" stroke-width="1.3" filter="url(#shadow)"/>
-      <text x="135" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#A4262C">💻  Ops VM  ·  group1-final</text>
-      <text x="135" y="36" text-anchor="middle" font-size="10" fill="#323130">10.2.0.4 · existing legacy host</text>
+      <text x="135" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#A4262C">⚙  Azure VMSS Run Command</text>
+      <text x="135" y="36" text-anchor="middle" font-size="10" fill="#323130">GitHub Actions via Azure control plane</text>
       <text x="135" y="52" text-anchor="middle" font-size="9" fill="#323130">• Self-hosted GitHub Actions runner</text>
       <text x="135" y="66" text-anchor="middle" font-size="9" fill="#323130">• SonarQube (configured by Ansible)</text>
     </g>
@@ -333,7 +333,7 @@
       <rect width="270" height="58" rx="8" fill="#FFFFFF" stroke="#A4262C" stroke-width="1.3" filter="url(#shadow)"/>
       <text x="135" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#A4262C">🛡  Network Security Groups</text>
       <text x="135" y="36" text-anchor="middle" font-size="9" fill="#323130">nsg-secureflow-dev-web · nsg-secureflow-dev-api</text>
-      <text x="135" y="50" text-anchor="middle" font-size="9" fill="#605E5C">SSH only from snet-ops; ingress from snet-appgw</text>
+      <text x="135" y="50" text-anchor="middle" font-size="9" fill="#605E5C">No public SSH; private VMSS deployment</text>
     </g>
   </g>
 
@@ -452,7 +452,7 @@
     <g transform="translate(14, 336)">
       <rect width="192" height="60" rx="6" fill="#F5EFFA" stroke="#5C2D91"/>
       <text x="96" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#3D1A78">Self-hosted Runner</text>
-      <text x="96" y="32" text-anchor="middle" font-size="9" fill="#323130">secureflow-ops-runner</text>
+      <text x="96" y="32" text-anchor="middle" font-size="9" fill="#323130">GitHub hosted runner + Azure login</text>
       <text x="96" y="46" text-anchor="middle" font-size="9" fill="#605E5C">runs on Ops VM, reaches private VMSS</text>
     </g>
 
@@ -514,7 +514,7 @@
 
   <!-- GitHub → Self-hosted runner on Ops VM -->
   <path d="M 1620 225 C 1480 260, 1380 540, 1340 800" stroke="#5C2D91" stroke-width="1.8" stroke-dasharray="5,3" fill="none" marker-end="url(#arrow-purple)"/>
-  <text x="1342" y="500" font-size="10" font-weight="600" fill="#5C2D91" text-anchor="end">jobs → self-hosted runner</text>
+  <text x="1342" y="500" font-size="10" font-weight="600" fill="#5C2D91" text-anchor="end">jobs → Azure Run Command</text>
 
   <!-- Runner → Terraform → TF state -->
   <path d="M 1320 880 C 1480 880, 1620 920, 1620 940" stroke="#5C2D91" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arrow-purple)"/>
@@ -533,7 +533,7 @@
       <text x="20" y="80">✓  Routing: <tspan font-weight="700">/</tspan> → frontend pool (port 80, nginx)  ·  <tspan font-weight="700">/api/*</tspan> → backend pool (port 8080, /api/health probe).</text>
 
       <text x="900" y="44">✓  Monitoring: App Insights + Log Analytics + 3+ metric/Kusto alerts → Action Groups → Slack.</text>
-      <text x="900" y="62">✓  Automation: GitHub Actions (infra/frontend/backend) on self-hosted runner; TF remote state in Storage.</text>
+      <text x="900" y="62">✓  Automation: GitHub Actions (infra/frontend/backend) with Azure Run Command; TF remote state in Storage.</text>
       <text x="900" y="80">✓  Security: NSGs limit AppGW→tier ingress, ops-only SSH; Bastion for admin; Managed Identity → Key Vault.</text>
     </g>
   </g>

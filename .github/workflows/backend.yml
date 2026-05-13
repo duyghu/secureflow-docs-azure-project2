@@ -5,16 +5,19 @@ on:
     branches: ["main"]
     paths:
       - "apps/backend/**"
-      - "config/ansible/**"
       - ".github/workflows/backend.yml"
   pull_request:
     paths:
       - "apps/backend/**"
-      - "config/ansible/**"
+      - ".github/workflows/backend.yml"
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   build-test-scan-package:
-    runs-on: [self-hosted, Linux, X64, secureflow-ops]
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: apps/backend
@@ -26,13 +29,7 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "21"
-
-      - name: Install Maven
-        run: |
-          if ! command -v mvn >/dev/null 2>&1; then
-            sudo apt-get update
-            sudo apt-get install -y maven
-          fi
+          cache: maven
 
       - name: Test, package, and generate coverage
         run: mvn -B clean verify
@@ -40,8 +37,9 @@ jobs:
       - name: SonarQube scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || 'http://127.0.0.1:9000' }}
         run: |
-          if [ -z "$SONAR_TOKEN" ]; then
+          if [ -z "${SONAR_TOKEN:-}" ]; then
             echo "SONAR_TOKEN is empty. Skipping SonarQube scan."
             exit 0
           fi
@@ -49,7 +47,7 @@ jobs:
           mvn -B sonar:sonar \
             -Dsonar.projectKey=secureflow-docs-azure-project2 \
             -Dsonar.projectName="SecureFlow Docs Azure Project 2" \
-            -Dsonar.host.url=http://127.0.0.1:9000 \
+            -Dsonar.host.url="$SONAR_HOST_URL" \
             -Dsonar.token="$SONAR_TOKEN" \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
@@ -61,35 +59,94 @@ jobs:
   deploy:
     needs: build-test-scan-package
     if: github.ref == 'refs/heads/main'
-    runs-on: [self-hosted, Linux, X64, secureflow-ops]
-
+    runs-on: ubuntu-latest
+    env:
+      RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP_NAME || 'rg-secureflow-project2' }}
+      STORAGE_ACCOUNT: ${{ vars.ARTIFACT_STORAGE_ACCOUNT || 'tfstatesfdocs2duyghu' }}
+      ARTIFACT_CONTAINER: ${{ vars.ARTIFACT_CONTAINER || 'artifacts' }}
+      BACKEND_VMSS_NAME: ${{ vars.BACKEND_VMSS_NAME || 'vmss-secureflow-dev-backend' }}
+      KEY_VAULT_URI: ${{ vars.KEY_VAULT_URI || 'https://kv-sfdocs-f2dd4d.vault.azure.net/' }}
+      SQL_SERVER_FQDN: ${{ vars.SQL_SERVER_FQDN || 'sql-secureflow-dev.database.windows.net' }}
+      SQL_DATABASE_NAME: ${{ vars.SQL_DATABASE_NAME || 'sqldb-secureflow-docs' }}
+      JRE_URL: ${{ vars.JRE_URL || 'https://api.adoptium.net/v3/binary/latest/21/ga/linux/x64/jre/hotspot/normal/eclipse' }}
     steps:
-      - uses: actions/checkout@v4
-
       - uses: actions/download-artifact@v4
         with:
           name: secureflow-backend
           path: apps/backend/target
 
-      - name: Deploy backend from self-hosted ops runner
-        env:
-          OPS_SSH_KEY: ${{ secrets.OPS_SSH_KEY }}
-          KEY_VAULT_URI: ${{ vars.KEY_VAULT_URI || 'https://kv-sfdocs-29c28e.vault.azure.net/' }}
-          SQL_SERVER_FQDN: ${{ vars.SQL_SERVER_FQDN || 'sql-secureflow-dev.database.windows.net' }}
-          SQL_DATABASE_NAME: ${{ vars.SQL_DATABASE_NAME || 'sqldb-secureflow-docs' }}
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Upload backend artifact to private deployment storage
         run: |
-          install -m 700 -d ~/.ssh
-          printf '%s\n' "$OPS_SSH_KEY" > ~/.ssh/group1-final_key.pem
-          chmod 600 ~/.ssh/group1-final_key.pem
+          set -euo pipefail
+          az storage container create --account-name "$STORAGE_ACCOUNT" --name "$ARTIFACT_CONTAINER" --auth-mode login --only-show-errors >/dev/null
+          az storage blob upload \
+            --account-name "$STORAGE_ACCOUNT" \
+            --container-name "$ARTIFACT_CONTAINER" \
+            --name secureflow-docs-backend.jar \
+            --file apps/backend/target/secureflow-docs-backend-0.1.0.jar \
+            --overwrite \
+            --auth-mode login \
+            --only-show-errors >/dev/null
 
-          sudo apt-get update
-          sudo apt-get install -y ansible python3-pip
+      - name: Deploy backend to private VMSS through Azure Run Command
+        run: |
+          set -euo pipefail
+          EXPIRY=$(date -u -d '+2 hours' '+%Y-%m-%dT%H:%MZ')
+          ARTIFACT_URL=$(az storage blob generate-sas \
+            --account-name "$STORAGE_ACCOUNT" \
+            --container-name "$ARTIFACT_CONTAINER" \
+            --name secureflow-docs-backend.jar \
+            --permissions r \
+            --expiry "$EXPIRY" \
+            --full-uri \
+            --auth-mode login \
+            --as-user \
+            --only-show-errors \
+            -o tsv)
 
-          ansible-galaxy collection install -r config/ansible/requirements.yml
+          SCRIPT=$(cat <<SCRIPT_EOF
+          set -euo pipefail
+          install -d -m 755 /opt/secureflow/backend /opt/secureflow/java
+          if [ ! -x /opt/secureflow/java/bin/java ]; then
+            curl -fsSL '$JRE_URL' -o /tmp/temurin21-jre.tar.gz
+            tar -xzf /tmp/temurin21-jre.tar.gz -C /opt/secureflow/java --strip-components=1
+          fi
+          curl -fsSL '$ARTIFACT_URL' -o /opt/secureflow/backend/secureflow-docs-api.jar
+          printf '%s\n' \
+            '[Unit]' \
+            'Description=SecureFlow Docs API' \
+            'After=network-online.target' \
+            '' \
+            '[Service]' \
+            'Environment=KEY_VAULT_URI=$KEY_VAULT_URI' \
+            'Environment=SQL_SERVER_FQDN=$SQL_SERVER_FQDN' \
+            'Environment=SQL_DATABASE_NAME=$SQL_DATABASE_NAME' \
+            'WorkingDirectory=/opt/secureflow/backend' \
+            'ExecStart=/opt/secureflow/java/bin/java -jar /opt/secureflow/backend/secureflow-docs-api.jar' \
+            'Restart=always' \
+            'RestartSec=8' \
+            '' \
+            '[Install]' \
+            'WantedBy=multi-user.target' \
+            > /etc/systemd/system/secureflow-api.service
+          systemctl daemon-reload
+          systemctl enable --now secureflow-api
+          systemctl restart secureflow-api
+          sleep 15
+          curl -fsS http://127.0.0.1:8080/api/health
+          SCRIPT_EOF
+          )
 
-          ANSIBLE_HOST_KEY_CHECKING=False \
-            KEY_VAULT_URI="$KEY_VAULT_URI" \
-            SQL_SERVER_FQDN="$SQL_SERVER_FQDN" \
-            SQL_DATABASE_NAME="$SQL_DATABASE_NAME" \
-            BACKEND_ARTIFACT="$GITHUB_WORKSPACE/apps/backend/target/secureflow-docs-backend-0.1.0.jar" \
-            ansible-playbook config/ansible/site.yml --limit backend -i config/ansible/inventories/prod/hosts.ini --private-key ~/.ssh/group1-final_key.pem
+          az vmss run-command invoke \
+            --resource-group "$RESOURCE_GROUP" \
+            --name "$BACKEND_VMSS_NAME" \
+            --instance-id 0 \
+            --command-id RunShellScript \
+            --scripts "$SCRIPT" \
+            --only-show-errors

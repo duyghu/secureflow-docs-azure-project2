@@ -1,39 +1,30 @@
 resource "azurerm_subnet" "app_gateway" {
-  name                 = "snet-appgw"
+  name                 = "snet-secureflow-dev-appgw"
   resource_group_name  = var.resource_group_name
   virtual_network_name = var.vnet_name
-  address_prefixes     = ["10.2.1.0/24"]
+  address_prefixes     = ["10.0.11.0/24"]
 }
 
 resource "azurerm_subnet" "web" {
-  name                 = "snet-web"
+  name                 = "snet-secureflow-dev-web"
   resource_group_name  = var.resource_group_name
   virtual_network_name = var.vnet_name
-  address_prefixes     = ["10.2.2.0/24"]
+  address_prefixes     = ["10.0.12.0/24"]
 }
 
 resource "azurerm_subnet" "api" {
-  name                 = "snet-api"
+  name                 = "snet-secureflow-dev-api"
   resource_group_name  = var.resource_group_name
   virtual_network_name = var.vnet_name
-  address_prefixes     = ["10.2.3.0/24"]
+  address_prefixes     = ["10.0.13.0/24"]
 }
 
 resource "azurerm_subnet" "data" {
-  name                              = "snet-data"
+  name                              = "snet-secureflow-dev-data"
   resource_group_name               = var.resource_group_name
   virtual_network_name              = var.vnet_name
-  address_prefixes                  = ["10.2.4.0/24"]
+  address_prefixes                  = ["10.0.14.0/24"]
   private_endpoint_network_policies = "Disabled"
-}
-
-resource "azurerm_public_ip" "nat" {
-  name                = "pip-${var.name_prefix}-nat"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  allocation_method   = "Static"
-  sku                 = "Standard"
-  tags                = var.tags
 }
 
 resource "azurerm_nat_gateway" "compute" {
@@ -44,12 +35,6 @@ resource "azurerm_nat_gateway" "compute" {
   idle_timeout_in_minutes = 10
   tags                    = var.tags
 }
-
-resource "azurerm_nat_gateway_public_ip_association" "compute" {
-  nat_gateway_id       = azurerm_nat_gateway.compute.id
-  public_ip_address_id = azurerm_public_ip.nat.id
-}
-
 resource "azurerm_subnet_nat_gateway_association" "web" {
   subnet_id      = azurerm_subnet.web.id
   nat_gateway_id = azurerm_nat_gateway.compute.id
@@ -74,7 +59,7 @@ resource "azurerm_network_security_group" "web" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "80"
-    source_address_prefix      = "10.2.1.0/24"
+    source_address_prefix      = "10.0.11.0/24"
     destination_address_prefix = "*"
   }
 
@@ -86,7 +71,7 @@ resource "azurerm_network_security_group" "web" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = "10.2.0.0/24"
+    source_address_prefix      = "10.0.5.0/24"
     destination_address_prefix = "*"
   }
 }
@@ -105,7 +90,7 @@ resource "azurerm_network_security_group" "api" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "8080"
-    source_address_prefix      = "10.2.1.0/24"
+    source_address_prefix      = "10.0.11.0/24"
     destination_address_prefix = "*"
   }
 
@@ -117,7 +102,7 @@ resource "azurerm_network_security_group" "api" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = "10.2.0.0/24"
+    source_address_prefix      = "10.0.5.0/24"
     destination_address_prefix = "*"
   }
 }

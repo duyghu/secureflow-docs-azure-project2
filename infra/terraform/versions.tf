@@ -2,8 +2,8 @@ terraform {
   required_version = ">= 1.6.0"
 
   backend "azurerm" {
-    resource_group_name  = "group1_final"
-    storage_account_name = "tfstategrp1sf26640"
+    resource_group_name  = "rg-secureflow-project2"
+    storage_account_name = "tfstatesfdocs2duyghu"
     container_name       = "tfstate"
     key                  = "secureflow-dev.tfstate"
   }

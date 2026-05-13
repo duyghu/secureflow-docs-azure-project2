@@ -5,16 +5,19 @@ on:
     branches: ["main"]
     paths:
       - "apps/frontend/**"
-      - "config/ansible/**"
       - ".github/workflows/frontend.yml"
   pull_request:
     paths:
       - "apps/frontend/**"
-      - "config/ansible/**"
+      - ".github/workflows/frontend.yml"
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   build-scan-package:
-    runs-on: [self-hosted, Linux, X64, secureflow-ops]
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: apps/frontend
@@ -43,24 +46,85 @@ jobs:
   deploy:
     needs: build-scan-package
     if: github.ref == 'refs/heads/main'
-    runs-on: [self-hosted, Linux, X64, secureflow-ops]
+    runs-on: ubuntu-latest
+    env:
+      RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP_NAME || 'rg-secureflow-project2' }}
+      STORAGE_ACCOUNT: ${{ vars.ARTIFACT_STORAGE_ACCOUNT || 'tfstatesfdocs2duyghu' }}
+      ARTIFACT_CONTAINER: ${{ vars.ARTIFACT_CONTAINER || 'artifacts' }}
+      FRONTEND_VMSS_NAME: ${{ vars.FRONTEND_VMSS_NAME || 'vmss-secureflow-dev-frontend' }}
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           name: secureflow-frontend
           path: apps/frontend
 
-      - name: Deploy frontend from self-hosted ops runner
-        env:
-          OPS_SSH_KEY: ${{ secrets.OPS_SSH_KEY }}
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Upload frontend artifact to private deployment storage
         run: |
-          install -m 700 -d ~/.ssh
-          printf '%s\n' "$OPS_SSH_KEY" > ~/.ssh/group1-final_key.pem
-          chmod 600 ~/.ssh/group1-final_key.pem
-          sudo apt-get update
-          sudo apt-get install -y ansible python3-pip
-          ansible-galaxy collection install -r config/ansible/requirements.yml
-          ANSIBLE_HOST_KEY_CHECKING=False \
-            FRONTEND_ARTIFACT="$GITHUB_WORKSPACE/apps/frontend/dist.tar.gz" \
-            ansible-playbook config/ansible/site.yml --limit frontend -i config/ansible/inventories/prod/hosts.ini --private-key ~/.ssh/group1-final_key.pem
+          set -euo pipefail
+          az storage container create --account-name "$STORAGE_ACCOUNT" --name "$ARTIFACT_CONTAINER" --auth-mode login --only-show-errors >/dev/null
+          az storage blob upload \
+            --account-name "$STORAGE_ACCOUNT" \
+            --container-name "$ARTIFACT_CONTAINER" \
+            --name secureflow-frontend-dist.tar.gz \
+            --file apps/frontend/dist.tar.gz \
+            --overwrite \
+            --auth-mode login \
+            --only-show-errors >/dev/null
+
+      - name: Deploy frontend to private VMSS through Azure Run Command
+        run: |
+          set -euo pipefail
+          EXPIRY=$(date -u -d '+2 hours' '+%Y-%m-%dT%H:%MZ')
+          ARTIFACT_URL=$(az storage blob generate-sas \
+            --account-name "$STORAGE_ACCOUNT" \
+            --container-name "$ARTIFACT_CONTAINER" \
+            --name secureflow-frontend-dist.tar.gz \
+            --permissions r \
+            --expiry "$EXPIRY" \
+            --full-uri \
+            --auth-mode login \
+            --as-user \
+            --only-show-errors \
+            -o tsv)
+
+          SCRIPT=$(cat <<SCRIPT_EOF
+          set -euo pipefail
+          install -d -m 755 /opt/secureflow/frontend
+          curl -fsSL '$ARTIFACT_URL' -o /tmp/secureflow-frontend-dist.tar.gz
+          rm -rf /opt/secureflow/frontend/*
+          tar -xzf /tmp/secureflow-frontend-dist.tar.gz -C /opt/secureflow/frontend
+          printf ok > /opt/secureflow/frontend/health
+          printf '%s\n' \
+            '[Unit]' \
+            'Description=SecureFlow Frontend' \
+            'After=network-online.target' \
+            '' \
+            '[Service]' \
+            'WorkingDirectory=/opt/secureflow/frontend' \
+            'ExecStart=/usr/bin/python3 -m http.server 80' \
+            'Restart=always' \
+            'RestartSec=5' \
+            '' \
+            '[Install]' \
+            'WantedBy=multi-user.target' \
+            > /etc/systemd/system/secureflow-frontend.service
+          systemctl daemon-reload
+          systemctl enable --now secureflow-frontend
+          systemctl restart secureflow-frontend
+          curl -fsS http://127.0.0.1/health
+          SCRIPT_EOF
+          )
+
+          az vmss run-command invoke \
+            --resource-group "$RESOURCE_GROUP" \
+            --name "$FRONTEND_VMSS_NAME" \
+            --instance-id 0 \
+            --command-id RunShellScript \
+            --scripts "$SCRIPT" \
+            --only-show-errors

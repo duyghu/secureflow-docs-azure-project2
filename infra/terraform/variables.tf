@@ -7,13 +7,13 @@ variable "project" {
 variable "resource_group_name" {
   type        = string
   description = "Existing Azure resource group that already contains the ops VM."
-  default     = "group1_final"
+  default     = "rg-secureflow-project2"
 }
 
 variable "vnet_name" {
   type        = string
   description = "Existing VNet that contains the ops VM."
-  default     = "group1-final-vnet"
+  default     = "vnet-secure-app"
 }
 
 variable "environment" {
@@ -25,7 +25,7 @@ variable "environment" {
 variable "location" {
   type        = string
   description = "Azure region."
-  default     = "swedencentral"
+  default     = "westeurope"
 }
 
 variable "admin_username" {
@@ -77,13 +77,13 @@ variable "budget_start_date" {
 variable "frontend_load_balancer_private_ip" {
   type        = string
   description = "Static private IP for the frontend internal load balancer."
-  default     = "10.2.2.10"
+  default     = "10.0.12.10"
 }
 
 variable "backend_load_balancer_private_ip" {
   type        = string
   description = "Static private IP for the backend internal load balancer."
-  default     = "10.2.3.10"
+  default     = "10.0.13.10"
 }
 
 variable "appgw_ssl_certificate_base64" {

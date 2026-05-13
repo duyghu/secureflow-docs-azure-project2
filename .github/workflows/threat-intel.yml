@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   refresh-waf-threat-feed:
-    runs-on: [self-hosted, Linux, X64, secureflow-ops]
+    runs-on: ubuntu-latest
     steps:
       - uses: azure/login@v2
         with:
@@ -21,7 +21,7 @@ jobs:
 
       - name: Fetch EmergingThreats feed and update WAF custom rule
         env:
-          RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP_NAME || 'group1_final' }}
+          RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP_NAME || 'rg-secureflow-project2' }}
           WAF_POLICY_NAME: waf-secureflow-dev
           RULE_NAME: BlockThreatIntelIPs
           FEED_URL: https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt
